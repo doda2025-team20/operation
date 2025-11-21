@@ -13,6 +13,8 @@ services:
   model-service:
     image: ghcr.io/doda2025-team20/model-service:latest
     container_name: model-service
+    # ports:
+    #   - "8081:8081" # Expose if needed for local testing
     # environment:
       # - MODEL_PORT=8081
       # - MODEL_URL="" # Source URL for model download
