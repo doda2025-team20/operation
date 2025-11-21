@@ -1,6 +1,6 @@
 services:
-  app:
-    image: ghcr.io/doda2025-team20/frontend:latest
+  app-service:
+    image: ghcr.io/doda2025-team20/app:latest
     container_name: app-service
     ports:
       - "8080:8080"
@@ -11,7 +11,7 @@ services:
       unless-stopped
 
   model-service:
-    image: ghcr.io/doda2025-team20/backend:latest
+    image: ghcr.io/doda2025-team20/model-service:latest
     container_name: model-service
     # environment:
       # - MODEL_PORT=8081
