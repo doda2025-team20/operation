@@ -1,0 +1,51 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: 1.1.4 - Set Up Authorized Keys
+      ansible.posix.authorized_key:
+        user: vagrant
+        state: present
+        key: "{{ lookup('file', item) }}"
+      with_fileglob:
+        - ../keys/*.pub
+    
+    - name: 1.1.5 - Disable Swap
+      ansible.builtin.shell: swapoff -a
+
+    - name: 1.1.5 - Do not remount swap
+      ansible.builtin.lineinfile:
+        path: /etc/fstab
+        regexp: '^(/swap)'
+        state: absent
+
+    - name: 1.1.6 - Enable br_netfilter
+      ansible.builtin.copy:
+        content: |
+          overlay
+          br_netfilter
+        dest: /etc/modules-load.d/k8s.conf
+
+    - name: 1.1.6 - Load the modules without a reboot
+      community.general.modprobe:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - overlay
+        - br_netfilter
+
+    - name: 1.1.7 - Enable IP forwarding and bridge settings for Kubernetes
+      ansible.posix.sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        state: present
+        reload: true
+      loop:
+        - { name: 'net.ipv4.ip_forward', value: 1 }
+        - { name: 'net.bridge.bridge-nf-call-iptables', value: 1 }
+        - { name: 'net.bridge.bridge-nf-call-ip6tables', value: 1 }
+
+    - name: 1.1.8 - Add /etc/hosts entries for name resolution
+      ansible.builtin.copy:
+        src: ../hosts
+        dest: /etc/hosts
