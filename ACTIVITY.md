@@ -18,3 +18,8 @@ This week, I worked on containerizing the `model-service` backend. I created the
 
 `Petre-Alexandru Hautelman`: [lib-version](https://github.com/doda2025-team20/lib-version/pull/1), [app](https://github.com/doda2025-team20/app/pull/4/files)\
 I worked on the initial implementation of the `lib-version` library. Additionally, I focused on installing and integrating the library into the `app` project. This involved making modifications to the `app` Dockerfile and the GitHub workflow, such that the Maven m2 secrets are not included in the published Docker image.
+
+### Week Q2.3 (Nov 24+)
+
+`Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/7\
+This week, I worked along with *Norah* on preparing the Infrastructure-as-Code (IaC) for our Kubernetes cluster. Using Vagrant and Ansible, I mainly worked on creating a customizable setup to create a local VM cluster with one controller node and N worker nodes. I also made provisioning configuration that prepares all the nodes with the required setup to install Kubernetes, including disabling swap and proper network configuration. Additionally, I worked more closely with *Norah* on brainstorming and preparing the rest of the Ansible provisioning, to actually install K8s and configure containerd, making the general playbook ready for the others to specialize to the controller and worker nodes.
