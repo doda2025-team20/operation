@@ -1,0 +1,140 @@
+---
+- hosts: all
+  become: true
+  tasks:
+
+    - name: 1.1.4 - Set Up Authorized Keys
+      ansible.posix.authorized_key:
+        user: vagrant
+        state: present
+        key: "{{ lookup('file', item) }}"
+      with_fileglob:
+        - ../keys/*.pub
+
+    - name: 1.1.5 - Disable Swap
+      ansible.builtin.shell: swapoff -a
+
+    - name: 1.1.5 - Do not remount swap
+      ansible.builtin.lineinfile:
+        path: /etc/fstab
+        regexp: '^(/swap)'
+        state: absent
+
+    - name: 1.1.6 - Enable br_netfilter
+      ansible.builtin.copy:
+        content: |
+          overlay
+          br_netfilter
+        dest: /etc/modules-load.d/k8s.conf
+
+    - name: 1.1.6 - Load the modules without a reboot
+      community.general.modprobe:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - overlay
+        - br_netfilter
+
+    - name: 1.1.7 - Enable IP forwarding and bridge settings for Kubernetes
+      ansible.posix.sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        state: present
+        reload: true
+      loop:
+        - { name: 'net.ipv4.ip_forward', value: 1 }
+        - { name: 'net.bridge.bridge-nf-call-iptables', value: 1 }
+        - { name: 'net.bridge.bridge-nf-call-ip6tables', value: 1 }
+
+    - name: 1.1.8 - Add /etc/hosts entries for name resolution
+      ansible.builtin.copy:
+        src: ../hosts
+        dest: /etc/hosts
+
+    - name: 1.1.9 - Add Kubernetes repository
+      block:
+
+        - name: Ensure keyring directory exists
+          ansible.builtin.file:
+            path: /etc/apt/keyrings
+            state: directory
+
+        - name: Download Kubernetes APT release key
+          ansible.builtin.get_url:
+            url: https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
+            dest: /etc/apt/keyrings/kubernetes-release.key
+
+        - name: Convert key to GPG keyring
+          ansible.builtin.command:
+            cmd: gpg --dearmor --output /etc/apt/keyrings/kubernetes-apt-keyring.gpg /etc/apt/keyrings/kubernetes-release.key
+          args:
+            creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+        - name: Configure Kubernetes APT repository
+          ansible.builtin.apt_repository:
+            repo: >
+              deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg]
+              https://pkgs.k8s.io/core:/stable:/v1.32/deb/
+              /
+            state: present
+
+        - name: Update apt cache
+          ansible.builtin.apt:
+            update_cache: yes
+
+    - name: 1.1.10 - Install K8s tools
+      ansible.builtin.apt:
+        pkg:
+          - containerd
+          - runc
+          - kubeadm
+          - kubelet
+          - kubectl
+
+    - name: 1.1.11 - Configure Containerd
+      block:
+        - name: Create default containerd config
+          ansible.builtin.command:
+            cmd: containerd config default
+          register: containerd_default
+          changed_when: false
+
+        - name: Ensure /etc/containerd directory exists
+          ansible.builtin.file:
+            path: /etc/containerd
+            state: directory
+
+        - name: Write /etc/containerd/config.toml
+          ansible.builtin.copy:
+            dest: /etc/containerd/config.toml
+            content: "{{ containerd_default.stdout }}"
+
+        - name: Disable AppArmor in containerd config
+          ansible.builtin.lineinfile:
+            path: /etc/containerd/config.toml
+            regexp: '^\s*disable_apparmor\s*='
+            line: 'disable_apparmor = true'
+
+        - name: Set Kubernetes sandbox_image
+          ansible.builtin.lineinfile:
+            path: /etc/containerd/config.toml
+            regexp: '^\s*sandbox_image\s*='
+            line: 'sandbox_image = "registry.k8s.io/pause:3.10"'
+
+        - name: Enable SystemdCgroup in containerd
+          ansible.builtin.lineinfile:
+            path: /etc/containerd/config.toml
+            regexp: '^\s*SystemdCgroup\s*='
+            line: 'SystemdCgroup = true'
+
+        - name: Restart containerd
+          ansible.builtin.service:
+            name: containerd
+            state: restarted
+            enabled: yes
+
+    - name: 1.1.12 - Start and enable kubelet service
+      ansible.builtin.service:
+        name: kubelet
+        state: started
+        enabled: yes
