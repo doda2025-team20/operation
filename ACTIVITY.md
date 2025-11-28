@@ -34,3 +34,6 @@ This week, I worked on the initial files required for setting up the kubernetes 
 `Moegiez Bhatti`:
 PR Created: https://github.com/doda2025-team20/lib-version/pull/4
 PR Approved: https://github.com/doda2025-team20/model-service/pull/7
+
+`Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/10
+This week I added the initial implementation of the worker nodes's playbook, as well as an initial version of the finalization playbook for MetalLB and Ingres.
