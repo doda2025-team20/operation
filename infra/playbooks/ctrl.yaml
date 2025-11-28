@@ -1,4 +1,90 @@
 ---
-- hosts: all
-  become: true
+- name: Setup Kubernetes controller node
+  hosts: ctrl
+  become: yes
+
+  vars:
+    controller_ip: "192.168.56.100"
+    pod_network_cidr: "10.244.0.0/16"
+    kubeconfig_path: "/etc/kubernetes/admin.conf"
+
   tasks:
+    - name: Check if Kubernetes has already been initialized
+      stat:
+        path: "{{ kubeconfig_path }}"
+      register: kubeadm_conf
+
+    - name: Initialize Kubernetes control plane with kubeadm
+      shell: |
+        kubeadm init \
+          --apiserver-advertise-address={{ controller_ip }} \
+          --node-name=ctrl \
+          --pod-network-cidr={{ pod_network_cidr }}
+      args:
+        warn: false
+      when: not kubeadm_conf.stat.exists
+      register: kubeadm_init
+    
+    - name: Ensure .kube directory exists for vagrant
+      file:
+        path: /home/vagrant/.kube
+        state: directory
+        owner: vagrant
+        group: vagrant
+        mode: '0755'
+    
+    - name: Copy admin kubeconfig to vagrant user
+      copy:
+        src: "{{ kubeconfig_path }}"
+        dest: /home/vagrant/.kube/config
+        owner: vagrant
+        group: vagrant
+        mode: '0600'
+      when: kubeadm_conf.stat.exists or 
+            (kubeadm_init is defined and kubeadm_init is succeeded)
+    - name: Copy admin kubeconfig to Vagrant shared folder (host)
+      copy:
+        src: "{{ kubeconfig_path }}"
+        dest: /vagrant/admin.conf
+        owner: root
+        group: root
+        mode: '0644'
+      when: kubeadm_conf.stat.exists or 
+            (kubeadm_init is defined and kubeadm_init is succeeded)
+    - name: Create directory for Kubernetes manifests on controller
+      file:
+        path: /home/vagrant/k8s
+        state: directory
+        owner: vagrant
+        group: vagrant
+        mode: '0755'
+
+    - name: Copy Flannel manifest to controller
+      copy:
+        src: "../../k8s/flannel/kube-flannel.yml"
+        dest: /home/vagrant/k8s/kube-flannel.yml
+        owner: vagrant
+        group: vagrant
+        mode: '0644'
+
+    - name: Install Flannel CNI
+      shell: |
+        kubectl --kubeconfig {{ kubeconfig_path }} apply -f /home/vagrant/k8s/kube-flannel.yml
+      args:
+        warn: false
+      when: kubeadm_conf.stat.exists or 
+            (kubeadm_init is defined and kubeadm_init is succeeded)
+    - name: Add Helm GPG key
+      apt_key:
+        url: https://baltocdn.com/helm/signing.asc
+        state: present
+    - name: Add Helm apt repository
+      apt_repository:
+        repo: "deb https://baltocdn.com/helm/stable/debian/ all main"
+        state: present
+        filename: "helm-stable-debian"
+    - name: Install Helm
+      apt:
+        name: helm
+        state: present
+        update_cache: yes
