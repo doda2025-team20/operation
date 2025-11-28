@@ -30,3 +30,7 @@ After that shared foundation, I focused on implementing some provisioning steps 
 
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/6\
 This week, I worked on the initial files required for setting up the kubernetes dashboard, as well as istio installation using hel,. Additionally, I worked on documenting the steps required to access the kubernetes dashboard securely using kubectl port-forwarding and a bearer token. I also added some sample files for creating an istio gateway. Will provide extra ansible playbooks for installing istio and the dashboard.
+
+'Moegiez Bhatti':
+PR Created: https://github.com/doda2025-team20/lib-version/pull/4
+PR Approved: https://github.com/doda2025-team20/model-service/pull/7
