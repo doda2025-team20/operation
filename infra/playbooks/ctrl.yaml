@@ -8,88 +8,94 @@
     host_kubeconfig_path: "/vagrant/kubeconfig"
 
   tasks:
-    - name: "1.1.13 - Check if cluster is already initialized"
-      ansible.builtin.stat:
-        path: /etc/kubernetes/admin.conf
-      register: kubeadminconf
+    - name: "1.1.13 - Init cluster"
+      block:
+        - name: "Check if cluster is already initialized"
+          ansible.builtin.stat:
+            path: /etc/kubernetes/admin.conf
+          register: kubeadminconf
 
-    - name: "1.1.13 - Run kubeadm init (only when admin.conf does not exist)"
-      ansible.builtin.command: >
-        kubeadm init
-        --apiserver-advertise-address={{ apiserver_advertise_address }}
-        --node-name={{ node_name }}
-        --pod-network-cidr={{ pod_network_cidr }}
-      register: kubeadm_init
-      changed_when: "'initialized' in kubeadm_init.stdout or kubeadm_init.rc == 0"
-      failed_when: kubeadm_init.rc != 0 and "'already initialized' not in kubeadm_init.stderr"
-      when: not kubeadminconf.stat.exists
+        - name: "Run kubeadm init (only when admin.conf does not exist)"
+          ansible.builtin.command: >
+            kubeadm init
+            --apiserver-advertise-address={{ apiserver_advertise_address }}
+            --node-name={{ node_name }}
+            --pod-network-cidr={{ pod_network_cidr }}
+          register: kubeadm_init
+          changed_when: "'initialized' in kubeadm_init.stdout or kubeadm_init.rc == 0"
+          failed_when: kubeadm_init.rc != 0 and "'already initialized' not in kubeadm_init.stderr"
+          when: not kubeadminconf.stat.exists
 
-    - name: "1.1.14 - Ensure /home/vagrant/.kube exists"
-      ansible.builtin.file:
-        path: /home/vagrant/.kube
-        state: directory
-        owner: vagrant
-        group: vagrant
-        mode: '0700'
+    - name: "1.1.14 - Setup kubectl config"
+      block:
+        - name: "Ensure /home/vagrant/.kube exists"
+          ansible.builtin.file:
+            path: /home/vagrant/.kube
+            state: directory
+            owner: vagrant
+            group: vagrant
+            mode: '0700'
 
-    - name: "1.1.14 - Copy admin.conf to vagrant user's kubeconfig"
-      ansible.builtin.copy:
-        src: /etc/kubernetes/admin.conf
-        dest: /home/vagrant/.kube/config
-        remote_src: yes
-        owner: vagrant
-        group: vagrant
-        mode: '0600'
+        - name: "Copy admin.conf to vagrant user's kubeconfig"
+          ansible.builtin.copy:
+            src: /etc/kubernetes/admin.conf
+            dest: /home/vagrant/.kube/config
+            remote_src: yes
+            owner: vagrant
+            group: vagrant
+            mode: '0600'
 
-    - name: "1.1.14 - Copy admin.conf to host (synced) folder"
-      ansible.builtin.copy:
-        src: /etc/kubernetes/admin.conf
-        dest: "{{ host_kubeconfig_path }}"
-        remote_src: yes
-        owner: root
-        group: root
-        mode: '0644'
+        - name: "Copy admin.conf to host (synced) folder"
+          ansible.builtin.copy:
+            src: /etc/kubernetes/admin.conf
+            dest: "{{ host_kubeconfig_path }}"
+            remote_src: yes
+            owner: root
+            group: root
+            mode: '0644'
 
-    - name: "1.1.15 - Apply Flannel Pod Network YAML"
-      ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/flannel-io/flannel/v0.26.7/Documentation/kube-flannel.yml
-        dest: /tmp/kube-flannel.yml
-        mode: '0644'
+    - name: "1.1.15 - Create Flannel Pod Network"
+      block:
+        - name: "Download Flannel Pod Network YAML"
+          ansible.builtin.get_url:
+            url: https://raw.githubusercontent.com/flannel-io/flannel/v0.26.7/Documentation/kube-flannel.yml
+            dest: /tmp/kube-flannel.yml
+            mode: '0644'
 
-    - name: "1.1.15 - Apply Flannel network"
-      ansible.builtin.command:
-        cmd: "kubectl apply -f /tmp/kube-flannel.yml --kubeconfig /home/vagrant/.kube/config"
-      register: flannel_result
-      changed_when: "'configured' in flannel_result.stdout or 'created' in flannel_result.stdout"
+        - name: "Apply Flannel network"
+          ansible.builtin.command:
+            cmd: "kubectl apply -f /tmp/kube-flannel.yml --kubeconfig /home/vagrant/.kube/config"
+          register: flannel_result
+          changed_when: "'configured' in flannel_result.stdout or 'created' in flannel_result.stdout"
 
-    - name: "1.1.15 - Wait for Flannel DaemonSet to appear"
-      ansible.builtin.shell: >
-        kubectl get daemonset kube-flannel-ds -n kube-flannel --kubeconfig /home/vagrant/.kube/config
-      register: ds_check
-      retries: 10
-      delay: 2
-      until: ds_check.rc == 0
-      changed_when: "false"
+        - name: "Wait for Flannel DaemonSet to appear"
+          ansible.builtin.shell: >
+            kubectl get daemonset kube-flannel-ds -n kube-flannel --kubeconfig /home/vagrant/.kube/config
+          register: ds_check
+          retries: 10
+          delay: 2
+          until: ds_check.rc == 0
+          changed_when: "false"
 
-    - name: "1.1.15 - Read current kube-flannel container args"
-      ansible.builtin.shell: >
-        kubectl get daemonset kube-flannel-ds -n kube-flannel 
-        -o jsonpath='{range .spec.template.spec.containers[0].args[*]}{@}{"\n"}{end}' 
-        --kubeconfig /home/vagrant/.kube/config
-      register: ds_args
-      failed_when: "false"
-      changed_when: "false"
+        - name: "Read current kube-flannel container args"
+          ansible.builtin.shell: >
+            kubectl get daemonset kube-flannel-ds -n kube-flannel 
+            -o jsonpath='{range .spec.template.spec.containers[0].args[*]}{@}{"\n"}{end}' 
+            --kubeconfig /home/vagrant/.kube/config
+          register: ds_args
+          failed_when: "false"
+          changed_when: "false"
 
-    - name: "1.1.15 - Patch Flannel DaemonSet to add --iface=eth1 if missing"
-      ansible.builtin.shell: >
-          kubectl patch daemonset kube-flannel-ds -n kube-flannel
-          --type=json
-          -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--iface=eth1"}]'
-          --kubeconfig /home/vagrant/.kube/config
-      register: patch_result
-      changed_when: "'patched' in patch_result.stdout"
-      failed_when: patch_result.rc != 0 and "'already exists' not in patch_result.stderr"
-      when: "'--iface=eth1' not in ds_args.stdout"
+        - name: "Patch Flannel DaemonSet to add --iface=eth1 if missing"
+          ansible.builtin.shell: >
+              kubectl patch daemonset kube-flannel-ds -n kube-flannel
+              --type=json
+              -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--iface=eth1"}]'
+              --kubeconfig /home/vagrant/.kube/config
+          register: patch_result
+          changed_when: "'patched' in patch_result.stdout"
+          failed_when: patch_result.rc != 0 and "'already exists' not in patch_result.stderr"
+          when: "'--iface=eth1' not in ds_args.stdout"
 
     - name: "1.1.16 - Install Helm package manager"
       block:
@@ -98,27 +104,53 @@
             path: /etc/apt/keyrings
             state: directory
 
-        - name: "1.1.16 - Download Helm APT signing key"
+        - name: "Download Helm APT signing key"
           ansible.builtin.get_url:
             url: https://packages.buildkite.com/helm-linux/helm-debian/gpgkey
             dest: /etc/apt/keyrings/helm-signing.key
 
-        - name: "1.1.16 - Convert Helm key to GPG keyring"
+        - name: "Convert Helm key to GPG keyring"
           ansible.builtin.command:
             cmd: gpg --dearmor --output /etc/apt/keyrings/helm.gpg /etc/apt/keyrings/helm-signing.key
           args:
             creates: /etc/apt/keyrings/helm.gpg
 
-        - name: "1.1.16 - Add Helm APT repository"
+        - name: "Add Helm APT repository"
           ansible.builtin.apt_repository:
             repo: 'deb [signed-by=/etc/apt/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main'
             state: present
 
-        - name: "1.1.16 - Update apt cache"
+        - name: "Update apt cache"
           ansible.builtin.apt:
             update_cache: yes
 
-        - name: "1.1.16 - Install Helm"
+        - name: "Install Helm"
           ansible.builtin.apt:
             name: helm
             state: present
+
+    - name: "1.1.17 - Install helm-diff plugin"
+      block:
+        - name: "Get installed helm plugins (root)"
+          ansible.builtin.shell: "helm plugin list | awk 'NR>1 {print $1}'"
+          register: helm_plugins_root
+          changed_when: false
+          failed_when: false
+
+        - name: "Install helm-diff for root if missing"
+          ansible.builtin.command: >
+            helm plugin install https://github.com/databus23/helm-diff
+          when: "'diff' not in helm_plugins_root.stdout"
+
+        - name: "Get installed helm plugins (vagrant)"
+          ansible.builtin.shell: "helm plugin list | awk 'NR>1 {print $1}'"
+          register: helm_plugins_vagrant
+          become_user: vagrant
+          changed_when: false
+          failed_when: false
+
+        - name: "Install helm-diff if missing (vagrant)"
+          ansible.builtin.command: >
+            helm plugin install https://github.com/databus23/helm-diff
+          become_user: vagrant
+          when: "'diff' not in helm_plugins_vagrant.stdout"
