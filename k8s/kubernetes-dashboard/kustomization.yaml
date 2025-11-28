@@ -5,3 +5,4 @@ resources:
   - admin-bind.yaml
   - cluster-admin-role.yaml
   - serviceaccount.yaml
+  - ingress.yaml
