@@ -4,7 +4,7 @@ No work
 
 ### Week Q2.2 (Nov 17+)
 
-`Norah Milanesi`: https://github.com/doda2025-team20/app/pull/1\
+`Norah E. Milanesi`: https://github.com/doda2025-team20/app/pull/1\
 During this week I collaborated with *Konstantinos* and together we worked on containerizing both frontend and backend, supporting multiple architectures, stages and making them flexible.
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/lib-version/pull/2\
@@ -23,3 +23,7 @@ I worked on the initial implementation of the `lib-version` library. Additionall
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/7\
 This week, I worked along with *Norah* on preparing the Infrastructure-as-Code (IaC) for our Kubernetes cluster. Using Vagrant and Ansible, I mainly worked on creating a customizable setup to create a local VM cluster with one controller node and N worker nodes. I also made provisioning configuration that prepares all the nodes with the required setup to install Kubernetes, including disabling swap and proper network configuration. Additionally, I worked more closely with *Norah* on brainstorming and preparing the rest of the Ansible provisioning, to actually install K8s and configure containerd, making the general playbook ready for the others to specialize to the controller and worker nodes.
+
+`Norah E. Milanesi`: https://github.com/doda2025-team20/operation/pull/8\
+This week, I worked together with *Konstantinos* on the initial design and setup of our Infrastructure-as-Code workflow for the Kubernetes cluster. We collaborated on the early brainstorming, agreed on the structure of the Ansible provisioning, and aligned on how the controller and worker nodes should be prepared.
+After that shared foundation, I focused on implementing some provisioning steps in the general playbook. I added the Kubernetes APT repository configuration, handled the installation of the required Kubernetes tools, and implemented the containerd configuration, including generating the default config and applying the necessary runtime settings. I also set up the `kubelet` service so that it starts now and is enabled on future boots.
