@@ -3,7 +3,7 @@
   become: true
   tasks:
     - name: Generate join command on the controller
-      ansible.builtin.command: kubeadm token create --print-join-command
+      ansible.builtin.command: kubeadm token create --print-join-command --kubeconfig=/etc/kubernetes/admin.conf
       delegate_to: ctrl
       register: join_command_result
       run_once: true
