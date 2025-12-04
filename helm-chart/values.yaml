@@ -1,0 +1,21 @@
+app:
+  name: app-service
+  image: ghcr.io/doda2025-team20/app:latest
+  port: 8080
+
+model:
+  name: model-service
+  image: ghcr.io/doda2025-team20/model-service:latest
+  port: 8081
+
+  # Choose hostPath (true) to use the VM shared folder mounted into each VM.
+  # If false, k8 will use the PVC (see model-service-claim0-persistentvolumeclaim.yaml)
+  useHostPath: false
+
+  # only used when useHostPath == true
+  hostPath: /mnt/shared
+
+  # only used when useHostPath == false
+  storage: 100Mi
+
+  mountPath: /sms/output
