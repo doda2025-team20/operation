@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "myapp.fullname" . }}-grafana
+  name: {{ include "helm-chart.fullname" . }}-grafana
   labels:
-    {{- include "myapp.labels" . | nindent 4 }}
+    {{- include "helm-chart.labels" . | nindent 4 }}
     app.kubernetes.io/component: grafana
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "myapp.selectorLabels" . | nindent 6 }}
+      {{- include "helm-chart.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: grafana
   template:
     metadata:
       labels:
-        {{- include "myapp.selectorLabels" . | nindent 8 }}
+        {{- include "helm-chart.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: grafana
     spec:
       containers:
@@ -46,10 +46,10 @@ spec:
       volumes:
       - name: grafana-datasources
         configMap:
-          name: {{ include "myapp.fullname" . }}-grafana-datasources
+          name: {{ include "helm-chart.fullname" . }}-grafana-datasources
       - name: grafana-dashboards-provisioning
         configMap:
-          name: {{ include "myapp.fullname" . }}-grafana-dashboard-provisioning
+          name: {{ include "helm-chart.fullname" . }}-grafana-dashboard-provisioning
       - name: grafana-dashboards
         configMap:
-          name: {{ include "myapp.fullname" . }}-grafana-dashboards
+          name: {{ include "helm-chart.fullname" . }}-grafana-dashboards
