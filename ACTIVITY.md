@@ -33,12 +33,26 @@ This week, I worked together with *Konstantinos* on the initial design and setup
 After that shared foundation, I focused on implementing some provisioning steps in the general playbook. I added the Kubernetes APT repository configuration, handled the installation of the required Kubernetes tools, and implemented the containerd configuration, including generating the default config and applying the necessary runtime settings. I also set up the `kubelet` service so that it starts now and is enabled on future boots.
 
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/6\
-This week, I worked on the initial files required for setting up the kubernetes dashboard, as well as istio installation using hel,. Additionally, I worked on documenting the steps required to access the kubernetes dashboard securely using kubectl port-forwarding and a bearer token. I also added some sample files for creating an istio gateway. Will provide extra ansible playbooks for installing istio and the dashboard.
+This week, I worked on the initial files required for setting up the kubernetes dashboard, as well as istio installation using helm. Additionally, I worked on documenting the steps required to access the kubernetes dashboard securely using kubectl port-forwarding and a bearer token. I also added some sample files for creating an istio gateway. Will provide extra ansible playbooks for installing istio and the dashboard.
 
-`Moegiez Bhatti`:
-PR Created: (https://github.com/doda2025-team20/app/pull/7)
-
-PR Approved: (https://github.com/doda2025-team20/operation/pull/14)
+'Moegiez Bhatti':
+PR Created: https://github.com/doda2025-team20/lib-version/pull/4
+PR Approved: https://github.com/doda2025-team20/model-service/pull/7
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/10
 This week I added the initial implementation of the worker nodes's playbook, as well as an initial version of the finalization playbook for MetalLB and Ingres.
+
+### Week Q2.4 (Dec 1+)
+
+`Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/14\
+This week I took care of migrating our Docker Compose configuration file to one that can be used with Kubernetes on a cluster. I created a configuration with two separate deployments, one for the frontend and one for the backend, allowing them to scale independently. Each deployment has its associated service, and the frontend service is also connected to an ingress. Finally, each deployment has its own ConfigMap, allowing for independent configuration directly through the cluster, and the backend deployment includes a volume mapping for model persistency.
+
+`Norah E. Milanesi`: https://github.com/doda2025-team20/operation/pull/15
+This week, I focused on implementing the Grafana monitoring component of our DevOps assignment. I worked on creating an Helm chart integration for Grafana, which included developing three separate ConfigMaps (for datasources, dashboard provisioning, and the actual dashboards), implementing secret management through values.yaml, and making Grafana dashboard JSON files with multiple visualization types (gauge, timeseries, bar charts), since the other parts were still a work in progress I was not able to test the dashboards and therefore they are still a work in progress. I also wrote the related documentation.
+
+`Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/16
+This week, I implemented the alerting requirements for Assignment 3. I introduced the necessary Helm templates to define alerting rules and configure the AlertManager to handle notification via email. The key changes were in the templates/prometheus-rule.yaml (using the sms_requests_total metric from the monitoring part), templates/alertmanager-config.yaml (configuring an AlertmanagerConfig Custom Resource), and templates/alerting-secret.yaml (creating a Kubernetes Secret to store SMTP credentials).
+
+`Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/12\
+This week I worked on finishing the playbook for the istio and kubernetes dashboard. I helped with the creation of the helm chart, that contains 2 separate deployments ( for both frontend and backend ) as well as matching services to expose the pods and ingress to forward the traffic to the frontend service. I also tested the helm configuration in a different cluster, to make sure it works in a separate envinronment as well. I also reviewed the alerting part, and will review the entire application once everything is merged.
+
