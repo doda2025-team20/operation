@@ -39,3 +39,6 @@ PR Approved: https://github.com/doda2025-team20/model-service/pull/7
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/14\
 This week I took care of migrating our Docker Compose configuration file to one that can be used with Kubernetes on a cluster. I created a configuration with two separate deployments, one for the frontend and one for the backend, allowing them to scale independently. Each deployment has its associated service, and the frontend service is also connected to an ingress. Finally, each deployment has its own ConfigMap, allowing for independent configuration directly through the cluster, and the backend deployment includes a volume mapping for model persistency.
+
+`Norah E. Milanesi`:
+This week, I focused on implementing the Grafana monitoring component of our DevOps assignment. I worked on creating an Helm chart integration for Grafana, which included developing three separate ConfigMaps (for datasources, dashboard provisioning, and the actual dashboards), implementing secret management through values.yaml, and making Grafana dashboard JSON files with multiple visualization types (gauge, timeseries, bar charts), Prometheus query functions (rate, histogram_quantile, avg), and timeframe selector variables. I also wrote the related documentation.
