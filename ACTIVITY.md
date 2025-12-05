@@ -35,6 +35,9 @@ This week, I worked on the initial files required for setting up the kubernetes 
 PR Created: https://github.com/doda2025-team20/lib-version/pull/4
 PR Approved: https://github.com/doda2025-team20/model-service/pull/7
 
+`Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/10
+This week I added the initial implementation of the worker nodes's playbook, as well as an initial version of the finalization playbook for MetalLB and Ingres.
+
 ### Week Q2.4 (Dec 1+)
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/14\
@@ -42,3 +45,6 @@ This week I took care of migrating our Docker Compose configuration file to one 
 
 `Norah E. Milanesi`: https://github.com/doda2025-team20/operation/pull/15
 This week, I focused on implementing the Grafana monitoring component of our DevOps assignment. I worked on creating an Helm chart integration for Grafana, which included developing three separate ConfigMaps (for datasources, dashboard provisioning, and the actual dashboards), implementing secret management through values.yaml, and making Grafana dashboard JSON files with multiple visualization types (gauge, timeseries, bar charts), since the other parts were still a work in progress I was not able to test the dashboards and therefore they are still a work in progress. I also wrote the related documentation.
+
+`Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/16
+This week, I implemented the alerting requirements for Assignment 3. I introduced the necessary Helm templates to define alerting rules and configure the AlertManager to handle notification via email. The key changes were in the templates/prometheus-rule.yaml (using the sms_requests_total metric from the monitoring part), templates/alertmanager-config.yaml (configuring an AlertmanagerConfig Custom Resource), and templates/alerting-secret.yaml (creating a Kubernetes Secret to store SMTP credentials).
