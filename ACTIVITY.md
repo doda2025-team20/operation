@@ -29,7 +29,7 @@ This week, I worked together with *Konstantinos* on the initial design and setup
 After that shared foundation, I focused on implementing some provisioning steps in the general playbook. I added the Kubernetes APT repository configuration, handled the installation of the required Kubernetes tools, and implemented the containerd configuration, including generating the default config and applying the necessary runtime settings. I also set up the `kubelet` service so that it starts now and is enabled on future boots.
 
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/6\
-This week, I worked on the initial files required for setting up the kubernetes dashboard, as well as istio installation using hel,. Additionally, I worked on documenting the steps required to access the kubernetes dashboard securely using kubectl port-forwarding and a bearer token. I also added some sample files for creating an istio gateway. Will provide extra ansible playbooks for installing istio and the dashboard.
+This week, I worked on the initial files required for setting up the kubernetes dashboard, as well as istio installation using helm. Additionally, I worked on documenting the steps required to access the kubernetes dashboard securely using kubectl port-forwarding and a bearer token. I also added some sample files for creating an istio gateway. Will provide extra ansible playbooks for installing istio and the dashboard.
 
 'Moegiez Bhatti':
 PR Created: https://github.com/doda2025-team20/lib-version/pull/4
@@ -48,3 +48,7 @@ This week, I focused on implementing the Grafana monitoring component of our Dev
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/16
 This week, I implemented the alerting requirements for Assignment 3. I introduced the necessary Helm templates to define alerting rules and configure the AlertManager to handle notification via email. The key changes were in the templates/prometheus-rule.yaml (using the sms_requests_total metric from the monitoring part), templates/alertmanager-config.yaml (configuring an AlertmanagerConfig Custom Resource), and templates/alerting-secret.yaml (creating a Kubernetes Secret to store SMTP credentials).
+
+`Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/12\
+This week I worked on finishing the playbook for the istio and kubernetes dashboard. I helped with the creation of the helm chart, that contains 2 separate deployments ( for both frontend and backend ) as well as matching services to expose the pods and ingress to forward the traffic to the frontend service. I also tested the helm configuration in a different cluster, to make sure it works in a separate envinronment as well. I also reviewed the alerting part, and will review the entire application once everything is merged.
+
