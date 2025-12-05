@@ -34,3 +34,8 @@ This week, I worked on the initial files required for setting up the kubernetes 
 'Moegiez Bhatti':
 PR Created: https://github.com/doda2025-team20/lib-version/pull/4
 PR Approved: https://github.com/doda2025-team20/model-service/pull/7
+
+### Week Q2.4 (Dec 1+)
+
+`Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/14\
+This week I took care of migrating our Docker Compose configuration file to one that can be used with Kubernetes on a cluster. I created a configuration with two separate deployments, one for the frontend and one for the backend, allowing them to scale independently. Each deployment has its associated service, and the frontend service is also connected to an ingress. Finally, each deployment has its own ConfigMap, allowing for independent configuration directly through the cluster, and the backend deployment includes a volume mapping for model persistency.
