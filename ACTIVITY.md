@@ -19,6 +19,10 @@ This week, I worked on containerizing the `model-service` backend. I created the
 `Petre-Alexandru Hautelman`: [lib-version](https://github.com/doda2025-team20/lib-version/pull/1), [app](https://github.com/doda2025-team20/app/pull/4/files)\
 I worked on the initial implementation of the `lib-version` library. Additionally, I focused on installing and integrating the library into the `app` project. This involved making modifications to the `app` Dockerfile and the GitHub workflow, such that the Maven m2 secrets are not included in the published Docker image.
 
+`Moegiez Bhatti`:
+PR Created: https://github.com/doda2025-team20/lib-version/pull/4
+PR Approved: https://github.com/doda2025-team20/model-service/pull/7
+
 ### Week Q2.3 (Nov 24+)
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/7\
@@ -32,8 +36,9 @@ After that shared foundation, I focused on implementing some provisioning steps 
 This week, I worked on the initial files required for setting up the kubernetes dashboard, as well as istio installation using hel,. Additionally, I worked on documenting the steps required to access the kubernetes dashboard securely using kubectl port-forwarding and a bearer token. I also added some sample files for creating an istio gateway. Will provide extra ansible playbooks for installing istio and the dashboard.
 
 `Moegiez Bhatti`:
-PR Created: https://github.com/doda2025-team20/lib-version/pull/4
-PR Approved: https://github.com/doda2025-team20/model-service/pull/7
+PR Created: (https://github.com/doda2025-team20/app/pull/7)
+
+PR Approved: (https://github.com/doda2025-team20/operation/pull/14)
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/10
 This week I added the initial implementation of the worker nodes's playbook, as well as an initial version of the finalization playbook for MetalLB and Ingres.
