@@ -1,0 +1,20 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: sample-gateway
+  namespace: ingress-gateways
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: 100.100.100.0 # replace with the cluster service ip
+    metallb.universe.tf/allow-shared-ip: secret-100.100.100.0
+    metallb.io/loadBalancerIPs: 100.100.100.0
+    metallb.io/allow-shared-ip: secret-100.100.100.0
+spec:
+  gatewayClassName: istio
+  listeners:
+    - name: sample-listener-https
+      port: 443
+      protocol: HTTPS
+      hostname: location.example.com
+      allowedRoutes:
+        namespaces:
+          from: All

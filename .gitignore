@@ -1,1 +1,8 @@
-model/
+.idea
+
+output/
+
+.vagrant/
+
+vagrant/kubeconfig
+kubeconfig

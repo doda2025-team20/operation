@@ -19,6 +19,10 @@ This week, I worked on containerizing the `model-service` backend. I created the
 `Petre-Alexandru Hautelman`: [lib-version](https://github.com/doda2025-team20/lib-version/pull/1), [app](https://github.com/doda2025-team20/app/pull/4/files)\
 I worked on the initial implementation of the `lib-version` library. Additionally, I focused on installing and integrating the library into the `app` project. This involved making modifications to the `app` Dockerfile and the GitHub workflow, such that the Maven m2 secrets are not included in the published Docker image.
 
+`Moegiez Bhatti`:
+PR Created: https://github.com/doda2025-team20/lib-version/pull/4
+PR Approved: https://github.com/doda2025-team20/model-service/pull/7
+
 ### Week Q2.3 (Nov 24+)
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/7\

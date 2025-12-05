@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sms-frontend-deployment
+  labels:
+    app: sms-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sms-frontend
+  template:
+    metadata:
+      labels:
+        app: sms-frontend
+    spec:
+      containers:
+        - name: sms-service-frontend
+          image: ghcr.io/doda2025-team20/app:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MODEL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: sms-frontend-config
+                  key: MODEL_HOST
+            - name: APP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: sms-frontend-config
+                  key: APP_PORT
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sms-model-deployment
+  labels:
+    app: sms-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sms-backend
+  template:
+    metadata:
+      labels:
+        app: sms-backend
+    spec:
+      containers:
+        - name: sms-service-backend
+          image: ghcr.io/doda2025-team20/model-service:latest
+          ports:
+            - containerPort: 8081
+          volumeMounts:
+            - name: output-volume
+              mountPath: /sms/output
+          env:
+            - name: MODEL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: sms-backend-config
+                  key: MODEL_PORT
+            - name: MODEL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: sms-backend-config
+                  key: MODEL_URL
+            - name: DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: sms-backend-config
+                  key: DEBUG
+      volumes:
+        - name: output-volume
+          hostPath:
+            path: /sms-service/output/
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sms-frontend-service
+  labels:
+    app: sms-frontend
+spec:
+  selector:
+    app: sms-frontend
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sms-backend-service
+  labels:
+    app: sms-backend
+spec:
+  selector:
+    app: sms-backend
+  ports:
+    - port: 8081
+      targetPort: 8081
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sms-frontend-config
+data:
+  MODEL_HOST: "http://sms-backend-service:8081"
+  APP_PORT: "8080"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sms-backend-config
+data:
+  MODEL_PORT: "8081"
+  MODEL_URL: "" # Source URL for model download
+  DEBUG: "false"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sms-frontend-ingress
+spec:
+  defaultBackend:
+    service:
+      name: sms-frontend-service
+      port:
+        number: 8080
