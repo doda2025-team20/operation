@@ -2,3 +2,17 @@
 - hosts: all
   become: true
   tasks:
+    - name: Generate join command on the controller
+      ansible.builtin.command: kubeadm token create --print-join-command --kubeconfig=/etc/kubernetes/admin.conf
+      delegate_to: ctrl
+      register: join_command_result
+      run_once: true
+
+    - name: Check if node is already joined
+      ansible.builtin.stat:
+        path: /etc/kubernetes/kubelet.conf
+      register: kubelet_conf_stat
+
+    - name: Join the node to the cluster
+      ansible.builtin.command: "{{ join_command_result.stdout }}"
+      when: not kubelet_conf_stat.stat.exists

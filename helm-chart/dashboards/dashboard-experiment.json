@@ -1,0 +1,56 @@
+{
+    "id": null,
+    "uid": "sms-experiment",
+    "title": "Experimentation / A-B Evaluation Dashboard",
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "10s",
+    "panels": [
+      {
+        "type": "timeseries",
+        "title": "Request Volume per Version",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum by (result) (sms_requests_total)"
+          }
+        ],
+        "gridPos": { "h": 7, "w": 12, "x": 0, "y": 0 }
+      },
+      {
+        "type": "timeseries",
+        "title": "Latency Comparison (Histogram Rate)",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(sms_request_duration_seconds_bucket[2m])"
+          }
+        ],
+        "gridPos": { "h": 7, "w": 12, "x": 0, "y": 7 }
+      },
+      {
+        "type": "stat",
+        "title": "Average Request Duration",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sms_request_duration_seconds_sum / sms_request_duration_seconds_count"
+          }
+        ],
+        "gridPos": { "h": 5, "w": 6, "x": 0, "y": 14 }
+      },
+      {
+        "type": "stat",
+        "title": "Total Requests (All)",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum(sms_requests_total)"
+          }
+        ],
+        "gridPos": { "h": 5, "w": 6, "x": 6, "y": 14 }
+      }
+    ],
+    "templating": { "list": [] }
+  }

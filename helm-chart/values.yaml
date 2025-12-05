@@ -1,0 +1,40 @@
+app:
+  name: app-service
+  image: ghcr.io/doda2025-team20/app:latest
+  port: 8080
+
+  # Monitoring additions
+  metricsPort: 8080        # /metrics lives on same port as the API
+  host: app.local          # hostname for your Ingress
+
+model:
+  name: model-service
+  image: ghcr.io/doda2025-team20/model-service:latest
+  port: 8081
+
+  # Choose hostPath (true) to use the VM shared folder mounted into each VM.
+  useHostPath: false
+
+  # only used when useHostPath == true
+  hostPath: /mnt/shared
+
+  # only used when useHostPath == false
+  storage: 100Mi
+
+  mountPath: /sms/output
+
+# Monitoring switch so your ServiceMonitor is conditional
+monitoring:
+  enabled: true
+
+# Prometheus + Grafana config coming from kube-prometheus-stack dependency
+kube-prometheus-stack:
+  grafana:
+    enabled: true
+  alertmanager:
+    enabled: false    
+  prometheus:
+    prometheusSpec:
+      serviceMonitorSelector:
+        matchLabels:
+          team: doda2025-team20

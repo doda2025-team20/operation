@@ -6,3 +6,4 @@ resources:
   - cluster-admin-role.yaml
   - serviceaccount.yaml
   - ingress.yaml
+  - namespace.yaml

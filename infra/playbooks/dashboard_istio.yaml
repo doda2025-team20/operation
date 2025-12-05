@@ -1,0 +1,183 @@
+---
+- hosts: ctrl
+  become: true
+  vars:
+    # Kubeconfig on the controller VM
+    kubeconfig_path: /home/vagrant/.kube/config
+
+    # === Istio via Helm ===
+    istio_namespace: istio-system
+    istio_helm_repo_name: istio
+    istio_helm_repo_url: https://istio-release.storage.googleapis.com/charts
+    istio_base_release: istio-base
+    istiod_release: istiod
+    istio_ingress_release: istio-ingressgateway
+
+    # === Istio kustomize overlay (inside VM) ===
+    # Corresponds to infra/k8s/istio on your host
+    istio_kustomize_dir: /vagrant/k8s/istio
+    istio_wait_selector: app=istiod
+    istio_namespace_for_wait: istio-system
+
+    # === Kubernetes Dashboard via Helm ===
+    dashboard_namespace: kubernetes-dashboard
+    dashboard_helm_repo_name: kubernetes-dashboard
+    dashboard_helm_repo_url: https://kubernetes.github.io/dashboard/
+    dashboard_release: kubernetes-dashboard
+
+    # === Dashboard kustomize overlay (optional) ===
+    # Corresponds to infra/k8s/kubernetes-dashboard on your host
+    dashboard_kustomize_dir: /vagrant/k8s/kubernetes-dashboard
+
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+
+  tasks:
+    # ---------------------------------------------------------------------------
+    # Sanity check kubeconfig
+    # ---------------------------------------------------------------------------
+    - name: Ensure kubeconfig exists on controller
+      ansible.builtin.stat:
+        path: "{{ kubeconfig_path }}"
+      register: kubeconfig_stat
+
+    - name: Fail if kubeconfig is missing
+      ansible.builtin.fail:
+        msg: "Kubeconfig {{ kubeconfig_path }} does not exist on ctrl. Run ctrl playbook / kubeadm init first."
+      when: not kubeconfig_stat.stat.exists
+
+    # ---------------------------------------------------------------------------
+    # Istio via Helm
+    # ---------------------------------------------------------------------------
+    - name: Add Istio Helm repo (idempotent-ish)
+      ansible.builtin.shell: |
+        helm repo add {{ istio_helm_repo_name }} {{ istio_helm_repo_url }} 2>&1 || true
+      args:
+        executable: /bin/bash
+      register: istio_repo_add
+      changed_when: "'has been added' in istio_repo_add.stdout"
+
+    - name: Update Helm repos
+      ansible.builtin.command: helm repo update
+      register: helm_repo_update
+      changed_when: false
+
+    - name: Create istio-system namespace if it does not exist
+      ansible.builtin.shell: |
+        kubectl get ns {{ istio_namespace }} >/dev/null 2>&1 || \
+        kubectl create namespace {{ istio_namespace }}
+      args:
+        executable: /bin/bash
+      register: istio_ns
+      changed_when: "'namespace/{{ istio_namespace }} created' in istio_ns.stdout"
+
+    - name: Install / upgrade Istio base chart
+      ansible.builtin.command: >
+        helm upgrade --install {{ istio_base_release }} {{ istio_helm_repo_name }}/base
+        --namespace {{ istio_namespace }}
+      register: istio_base_install
+      changed_when: >
+        'deployed' in istio_base_install.stdout or
+        'upgraded' in istio_base_install.stdout
+
+    - name: Install / upgrade Istiod control plane
+      ansible.builtin.command: >
+        helm upgrade --install {{ istiod_release }} {{ istio_helm_repo_name }}/istiod
+        --namespace {{ istio_namespace }}
+        --set meshConfig.accessLogFile=/dev/stdout
+      register: istiod_install
+      changed_when: >
+        'deployed' in istiod_install.stdout or
+        'upgraded' in istiod_install.stdout
+
+    - name: Install / upgrade Istio ingress gateway
+      ansible.builtin.command: >
+        helm upgrade --install {{ istio_ingress_release }} {{ istio_helm_repo_name }}/gateway
+        --namespace {{ istio_namespace }}
+      register: istio_ingress_install
+      changed_when: >
+        'deployed' in istio_ingress_install.stdout or
+        'upgraded' in istio_ingress_install.stdout
+
+    #- name: Wait for Istio control plane pods to be ready
+     # ansible.builtin.command: >
+      #  kubectl wait --for=condition=ready pod
+       # -l {{ istio_wait_selector }}
+        #-n {{ istio_namespace_for_wait }} --timeout=300s
+      #register: wait_istiod
+      #changed_when: false
+      #failed_when: wait_istiod.rc != 0
+
+    # ---------------------------------------------------------------------------
+    # Gateway API CRDs (needed for Gateway objects in your Istio kustomization)
+    # ---------------------------------------------------------------------------
+    - name: Install Gateway API CRDs (standard channel)
+      ansible.builtin.command: >
+        kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
+      register: gatewayapi_apply
+      changed_when: >
+        'created' in gatewayapi_apply.stdout or
+        'configured' in gatewayapi_apply.stdout
+
+    # ---------------------------------------------------------------------------
+    # Istio extras via your kustomization (namespace/gateways/etc.)
+    # ---------------------------------------------------------------------------
+    - name: Check that Istio kustomization dir exists
+      ansible.builtin.stat:
+        path: "{{ istio_kustomize_dir }}"
+      register: istio_kustomization
+
+    - name: Fail if Istio kustomization dir is missing
+      ansible.builtin.fail:
+        msg: "Istio kustomization directory {{ istio_kustomize_dir }} does not exist on ctrl."
+      when: not istio_kustomization.stat.exists
+
+    - name: Apply Istio kustomization
+      ansible.builtin.command: >
+        kubectl apply -k {{ istio_kustomize_dir }}
+      register: istio_kustomize_apply
+      changed_when: >
+        'created' in istio_kustomize_apply.stdout or
+        'configured' in istio_kustomize_apply.stdout
+
+    # ---------------------------------------------------------------------------
+    # Kubernetes Dashboard via Helm
+    # ---------------------------------------------------------------------------
+    - name: Add Kubernetes Dashboard Helm repo (idempotent-ish)
+      ansible.builtin.shell: |
+        helm repo add {{ dashboard_helm_repo_name }} {{ dashboard_helm_repo_url }} 2>&1 || true
+      args:
+        executable: /bin/bash
+      register: dash_repo_add
+      changed_when: "'has been added' in dash_repo_add.stdout"
+
+    - name: Update Helm repos (again, cheap)
+      ansible.builtin.command: helm repo update
+      register: dash_repo_update
+      changed_when: false
+
+    - name: Install / upgrade Kubernetes Dashboard chart
+      ansible.builtin.command: >
+        helm upgrade --install {{ dashboard_release }} {{ dashboard_helm_repo_name }}/kubernetes-dashboard
+        --namespace {{ dashboard_namespace }} --create-namespace
+      register: dash_install
+      changed_when: >
+        'deployed' in dash_install.stdout or
+        'upgraded' in dash_install.stdout
+
+    # ---------------------------------------------------------------------------
+    # Optional: Dashboard overlay via your kustomization
+    # ---------------------------------------------------------------------------
+    - name: Check that dashboard kustomization dir exists
+      ansible.builtin.stat:
+        path: "{{ dashboard_kustomize_dir }}"
+      register: dash_kustomization
+
+    - name: Apply Kubernetes Dashboard kustomization (overlay)
+      ansible.builtin.command: >
+        kubectl apply -k {{ dashboard_kustomize_dir }}
+      register: dash_apply
+      changed_when: >
+        'created' in dash_apply.stdout or
+        'configured' in dash_apply.stdout
+      when: dash_kustomization.stat.exists

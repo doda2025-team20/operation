@@ -37,6 +37,13 @@ The `docker-compose.yml` file in this repository orchestrates the deployment of 
 docker-compose up -d
 ```
 
+In order to run the VMs, as well as to set them up properly, you can do:
+
+```
+cd infra
+vagrant up
+```
+
 The application will then be accessible at `http://localhost:8080`.
 
 The `docker-compose.yml` file specifies the use of container images for the **app** and **model-service** components, which are hosted on GitHub Container Registry, at `ghcr.io/doda2025-team20/app:latest` and `ghcr.io/doda2025-team20/model-service:latest`, respectively.

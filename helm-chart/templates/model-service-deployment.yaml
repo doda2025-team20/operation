@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.model.name }}
+  labels:
+    app: {{ .Values.model.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.model.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.model.name }}
+    spec:
+      containers:
+        - name: {{ .Values.model.name }}
+          image: {{ .Values.model.image }}
+          ports:
+            - containerPort: {{ .Values.model.port }}
+          volumeMounts:
+            - name: model-output
+              mountPath: {{ .Values.model.mountPath }}
+      volumes:
+        - name: model-output
+          {{- if .Values.model.useHostPath }}
+          hostPath:
+            path: {{ .Values.model.hostPath }}
+            type: Directory   # DirectoryOrCreate
+          {{- else }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.model.name }}-pvc
+          {{- end }}
