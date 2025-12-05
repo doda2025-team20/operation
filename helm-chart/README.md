@@ -13,6 +13,15 @@ Quick start:
 
 2. Install the chart
 ```bash
+# Basic installation
+helm install assignment-release ./helm-chart
+
+# Installation with custom admin password (RECOMMENDED)
+helm install assignment-release ./helm-chart \
+  --set grafana.adminPassword=your-secure-password
+```
+
+```bash
    helm install assignment-release helm-chart/
 ```
 
@@ -72,3 +81,80 @@ Or use a custom values file:
 ```bash
 helm install assignment-release helm-chart/ -f my-values.yaml
 ```
+
+
+# Grafana Monitoring Setup
+
+## Overview
+
+Grafana is deployed as part of the Helm chart and automatically provisions two dashboards:
+1. **App Metrics Dashboard** - Monitors application performance and user behavior
+2. **Experimental A/B Testing Dashboard** - Supports canary deployment decisions
+
+
+## Installation
+
+### Prerequisites
+
+Before deploying Grafana, ensure you have:
+- Kubernetes cluster running
+- Prometheus deployed and collecting metrics from the app
+- ServiceMonitor configured for Prometheus scraping
+
+### Verify Installation
+
+```bash
+# Check if Grafana pod is running
+kubectl get pods | grep grafana
+# Should show: STATUS = Running
+
+# Check if dashboards ConfigMap was created
+kubectl get configmap | grep grafana-dashboards
+
+# Check if datasource ConfigMap was created
+kubectl get configmap | grep grafana-datasources
+```
+
+## Accessing Grafana
+
+Access the application using minikube
+```
+   minikube service assignment-release-helm-chart-grafana --url  # Copy the URL and paste it into your browser
+```
+
+### Login Credentials
+
+**Username:** `admin`  
+**Password:** The value you set with `--set grafana.adminPassword=...` during installation
+
+**To retrieve your password:**
+```bash
+# From Kubernetes Secret
+kubectl get secret grafana-admin-secret -o jsonpath='{.data.admin-password}' | base64 -d
+
+# From Helm values
+helm get values assignment-release | grep adminPassword
+```
+
+**Default password (if not overridden):** `password123`
+
+**To change the password:**
+```bash
+helm upgrade assignment-release ./helm-chart \
+  --set grafana.adminPassword=password123
+```
+
+## Dashboards
+
+### 1. App Metrics Dashboard
+
+TO BE TESTED
+
+### 2. Experimental A/B Testing Dashboard
+
+TO BE TESTED
+
+
+## Metrics Requirements
+
+For the dashboards to work, the application must expose these metrics at the `/metrics` endpoint:

@@ -19,3 +19,19 @@ model:
   storage: 100Mi
 
   mountPath: /sms/output
+
+grafana:
+  image:
+    repository: grafana/grafana
+    tag: "10.0.0"
+    pullPolicy: IfNotPresent
+  
+  adminSecretName: grafana-admin-secret
+  adminUser: admin
+  adminPassword: changeme
+  
+  ingress:
+    enabled: true
+    className: nginx
+    host: grafana.example.com
+    annotations: {}
