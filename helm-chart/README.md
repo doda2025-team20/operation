@@ -83,6 +83,64 @@ helm install assignment-release helm-chart/ -f my-values.yaml
 ```
 
 
+## Prerequisites
+
+### Minikube must be running
+The Kubernetes API must be reachable before installing the Helm chart. If Minikube is not started, Helm will fail with errors such as:
+
+```bash
+kubernetes cluster unreachable: dial tcp 127.0.0.1:xxxxx: connect: connection refused
+```
+
+
+
+Start Minikube:
+
+```bash
+minikube start
+````
+
+Verify the cluster is reachable:
+
+```bash
+kubectl get nodes
+```
+
+### Prometheus Operator CRDs must be installed
+
+This chart includes resources such as `AlertmanagerConfig` and `PrometheusRule`, which belong to the Prometheus Operator API group (`monitoring.coreos.com`). These will fail unless the Prometheus Operator (commonly installed via `kube-prometheus-stack`) is present.
+
+Install the CRDs by installing the stack:
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install monitoring prometheus-community/kube-prometheus-stack
+```
+
+Verify that the CRDs exist:
+
+```bash
+kubectl get crds | grep monitoring.coreos.com
+```
+
+If these are missing, Helm will report errors such as:
+
+```
+no matches for kind "AlertmanagerConfig"
+ensure CRDs are installed first
+```
+
+## Installing the Helm Chart
+
+After ensuring that Minikube is running and the Prometheus Operator CRDs are installed, install the chart:
+
+```bash
+helm install assignment-release ./helm-chart
+```
+
+
+
 # Grafana Monitoring Setup
 
 ## Overview
