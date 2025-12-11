@@ -14,5 +14,5 @@ spec:
       labels:
         severity: warning
       annotations:
-        summary: "High traffic on {{ $labels.instance }}"
-        description: "SMS App is receiving {{ $value }} requests per minute."
+        summary: {{ `"High traffic on {{ $labels.instance }}"` | quote }}
+        description: {{`"SMS App is receiving {{ $value }} requests per minute."` | quote}}

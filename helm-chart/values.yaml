@@ -2,6 +2,10 @@ app:
   name: app-service
   image: ghcr.io/doda2025-team20/app:latest
   port: 8080
+  canary:
+    enabled: true
+    image: ghcr.io/doda2025-team20/app:latest
+    tag: v2
 
 model:
   name: model-service
@@ -19,6 +23,10 @@ model:
   storage: 100Mi
 
   mountPath: /sms/output
+  canary:
+    enabled: true
+    image: ghcr.io/doda2025-team20/model-service:latest
+    tag: v2
 
 grafana:
   image:
@@ -31,7 +39,24 @@ grafana:
   adminPassword: changeme
   
   ingress:
+    enabled: false
+
+istio:
+  enabled: true
+  
+  gateway:
+    name: my-gateway
+    ingressGatewaySelector:
+      istio: ingressgateway
+    hosts:
+      - "*"
+  
+  canary:
     enabled: true
-    className: nginx
-    host: grafana.example.com
-    annotations: {}
+    # Traffic split percentages
+    stableWeight: 90
+    canaryWeight: 10
+    # Enable sticky sessions (routes same user to same version)
+    stickySession:
+      enabled: true
+      cookieName: user-session
