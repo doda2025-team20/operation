@@ -47,7 +47,7 @@ istio:
   gateway:
     name: my-gateway
     ingressGatewaySelector:
-      istio: istio-ingressgateway
+      istio: ingressgateway
     hosts:
       - "*"
   
