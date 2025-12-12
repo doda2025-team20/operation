@@ -4,7 +4,7 @@ app:
   port: 8080
   canary:
     enabled: true
-    image: ghcr.io/doda2025-team20/app:latest
+    image: ghcr.io/doda2025-team20/app-sandbox:0.0.5-alpha
     tag: v2
 
 model:
@@ -24,9 +24,14 @@ model:
 
   mountPath: /sms/output
   canary:
-    enabled: true
+    enabled: false
     image: ghcr.io/doda2025-team20/model-service:latest
     tag: v2
+
+  shadow:
+    enabled: true
+    image: ghcr.io/doda2025-team20/model-service:latest
+    tag: v3
 
 grafana:
   image:
@@ -52,7 +57,7 @@ istio:
       - "*"
   
   canary:
-    enabled: true
+    enabled: false
     # Traffic split percentages
     stableWeight: 90
     canaryWeight: 10
@@ -60,3 +65,6 @@ istio:
     stickySession:
       enabled: true
       cookieName: user-session
+  shadow:
+    enabled: true
+    mirrorPercentage: 100

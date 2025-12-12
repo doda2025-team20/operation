@@ -60,3 +60,11 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Fail if both canary and shadow launch are enabled. We can't route traffic properly in that scenario
+*/}}
+
+{{- if and .Values.model.canary.enabled .Values.model.shadow.enabled }}
+{{- fail "model.canary.enabled and model.shadow.enabled cannot both be true at the same time" }}
+{{- end }}

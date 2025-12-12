@@ -3,17 +3,24 @@ apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
   name: {{ .Values.model.name }}-dr
-  labels:
-    {{- include "helm-chart.labels" . | nindent 4 }}
 spec:
   host: {{ .Values.model.name }}
   subsets:
-  - name: v1
-    labels:
-      version: v1
-  {{- if .Values.istio.canary.enabled }}
-  - name: v2
-    labels:
-      version: v2
+
+    # Stable (always)
+    - name: v1
+      labels:
+        version: v1
+
+  {{- if .Values.model.canary.enabled }}
+    # Canary subset
+    - name: {{ .Values.model.canary.tag }}
+      labels:
+        version: {{ .Values.model.canary.tag }}
+  {{- else if .Values.model.shadow.enabled }}
+    # Shadow subset
+    - name: {{ .Values.model.shadow.tag }}
+      labels:
+        version: {{ .Values.model.shadow.tag }}
   {{- end }}
 {{- end }}
