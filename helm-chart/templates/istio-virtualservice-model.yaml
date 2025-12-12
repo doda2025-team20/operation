@@ -7,21 +7,51 @@ metadata:
     {{- include "helm-chart.labels" . | nindent 4 }}
 spec:
   hosts:
-  - {{ .Values.model.name }}
+    - {{ .Values.model.name }}
   http:
+
   {{- if .Values.istio.canary.enabled }}
-  # Route from v2 app to v2 model
-  - match:
-    - sourceLabels:
-        version: v2
-    route:
-    - destination:
-        host: {{ .Values.model.name }}
-        subset: v2
+
+    # -----------------------
+    # Canary deployment
+    # -----------------------
+    - route:
+        - destination:
+            host: {{ .Values.model.name }}
+            subset: v1
+          weight: {{ .Values.istio.canary.stableWeight }}
+        - destination:
+            host: {{ .Values.model.name }}
+            subset: v2
+          weight: {{ .Values.istio.canary.canaryWeight }}
+
+  {{- else if .Values.istio.shadow.enabled }}
+
+    # -----------------------
+    # Shadow launch (traffic mirroring)
+    # -----------------------
+    - route:
+        - destination:
+            host: {{ .Values.model.name }}
+            subset: v1
+          weight: 100
+      mirror:
+        destination:
+          host: {{ .Values.model.name }}
+          subset: {{ .Values.model.shadow.tag }}
+      mirrorPercentage:
+        value: {{ .Values.istio.shadow.mirrorPercentage }}
+
+  {{- else }}
+
+    # -----------------------
+    # Default: stable only
+    # -----------------------
+    - route:
+        - destination:
+            host: {{ .Values.model.name }}
+            subset: v1
+          weight: 100
+
   {{- end }}
-  # Default route to v1 model
-  - route:
-    - destination:
-        host: {{ .Values.model.name }}
-        subset: v1
 {{- end }}
