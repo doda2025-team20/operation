@@ -31,17 +31,29 @@ A version-aware library (**lib-version**) will also be introduced to demonstrate
 
 ## ▶️ Deployment
 
+In order to run the VMs, and set up the Kubernetes Cluster, you can do:
+
+```bash
+cd infra
+vagrant up
+```
+
+This will create a ctrl VM and two worker node VMs. After that is finished, you need to get the proper tools and then run the finalization.yaml playbook in order to set up MetalLB load balancer and Ingress. Before that make sure you have the community.kubernetes collection installed:
+
+```bash
+ansible-galaxy collection install community.kubernetes
+```
+
+After that is done, we run `finalization.yaml` to set up MetalLB and Ingress:
+
+```bash
+ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory playbooks/finalization.yaml
+```
+
 The `docker-compose.yml` file in this repository orchestrates the deployment of the entire system. To deploy the application, ensure Docker and Docker Compose are installed. Download the `docker-compose.yml` file and run the following command in the terminal:
 
 ```bash
 docker-compose up -d
-```
-
-In order to run the VMs, as well as to set them up properly, you can do:
-
-```
-cd infra
-vagrant up
 ```
 
 The application will then be accessible at `http://localhost:8080`.
