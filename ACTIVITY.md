@@ -50,7 +50,7 @@ This week I took care of migrating our Docker Compose configuration file to one 
 `Norah E. Milanesi`: https://github.com/doda2025-team20/operation/pull/15\
 This week, I focused on implementing the Grafana monitoring component. I worked on creating an Helm chart integration for Grafana, which included developing three separate ConfigMaps (for datasources, dashboard provisioning, and the actual dashboards), implementing secret management through values.yaml, and making Grafana dashboard JSON files with multiple visualization types (gauge, timeseries, bar charts), since the other parts were still a work in progress I was not able to test the dashboards and therefore they are still a work in progress. I also wrote the related documentation.
 
-`Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/16
+`Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/16\
 This week, I implemented the alerting requirements for Assignment 3. I introduced the necessary Helm templates to define alerting rules and configure the AlertManager to handle notification via email. The key changes were in the templates/prometheus-rule.yaml (using the sms_requests_total metric from the monitoring part), templates/alertmanager-config.yaml (configuring an AlertmanagerConfig Custom Resource), and templates/alerting-secret.yaml (creating a Kubernetes Secret to store SMTP credentials).
 
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/12\
@@ -64,3 +64,6 @@ This week, I focused on implementing Istio traffic management. I worked on confi
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/app/pull/8\
 Upon Norah's finalization of the Istio traffic management, I implemented a new user interface for the frontend of the application, to represent the canary version to be experimented on. The UI is now comprised of a refreshed experience that is intuitive and modern, with a new color scheme, layout, and design elements. The Helm chart values have been updated (https://github.com/doda2025-team20/operation/pull/19) to include this new version on a 10% traffic weight, while the original version remains at 90%.
+
+`Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/21\
+This week I went back to our A2 submission, for which we had only an initial attempt at a finalization.yaml playbook. This initial attempt had multiple bugs that prevented the proper setup of MetalLB and Ingress. My PR addressed those bugs, ensuring that MetalLB and Ingress are now properly set up.
