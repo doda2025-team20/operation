@@ -43,6 +43,9 @@ PR Approved: https://github.com/doda2025-team20/model-service/pull/7
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/10
 This week I added the initial implementation of the worker nodes's playbook, as well as an initial version of the finalization playbook for MetalLB and Ingres.
 
+`Petre-Alexandru Hautelman`: https://github.com/doda2025-team20/operation/pull/9
+Worked together with Moegiez to implement the Kubernetes controller playbook, steps 13-17 of the assignment.
+
 ### Week Q2.4 (Dec 1+)
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/14\
@@ -56,6 +59,9 @@ This week, I implemented the alerting requirements for Assignment 3. I introduce
 
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/12\
 This week I worked on finishing the playbook for the istio and kubernetes dashboard. I helped with the creation of the helm chart, that contains 2 separate deployments ( for both frontend and backend ) as well as matching services to expose the pods and ingress to forward the traffic to the frontend service. I also tested the helm configuration in a different cluster, to make sure it works in a separate envinronment as well. I also reviewed the alerting part, and will review the entire application once everything is merged.
+
+`Petre-Alexandru Hautelman`: https://github.com/doda2025-team20/operation/pull/12
+I worked on the initial migration of the Docker Compose files to Kubernetes. I created a Helm chart for deploying the model and application services, which connects the app to the model server. The deployments utilize configurable variables for the name, image, and port, and the model service includes an optional shared folder.
 
 
 ## Week Q2.5 (Dec 8+)
