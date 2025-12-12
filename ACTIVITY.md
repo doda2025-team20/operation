@@ -68,3 +68,6 @@ Upon Norah's finalization of the Istio traffic management, I implemented a new u
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/21\
 This week I went back to our A2 submission, for which we had only an initial attempt at a finalization.yaml playbook. This initial attempt had multiple bugs that prevented the proper setup of MetalLB and Ingress. My PR addressed those bugs, ensuring that MetalLB and Ingress are now properly set up.
+
+`Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/20\
+This week, I worked on implementing a shadow launch strategy for the model service using Istio. I modified the existing VirtualService configuration to include traffic mirroring from the stable version (v1) to the newer shadown version (v3) of the model service. This setup allows us to test the new version under real traffic conditions without impacting the user experience. Additionally, I worked on writing documentation for our entire deployment strategies, including both canary deployment and shadow launch.
