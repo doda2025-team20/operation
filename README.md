@@ -29,7 +29,61 @@ A version-aware library (**lib-version**) will also be introduced to demonstrate
 
 ---
 
-## ▶️ Deployment
+## 🐳 Docker Compose Setup
+
+The `docker-compose.yml` file in this repository orchestrates the deployment of the entire system for local development and testing.
+
+### Prerequisites
+Ensure you have Docker and Docker Compose installed.
+
+### Running the Application
+
+You can start the application using either Docker Compose v2 (recommended) or v1.
+
+**Using Docker Compose v2:**
+```bash
+docker compose up -d
+```
+
+**Using Docker Compose v1:**
+```bash
+docker-compose up -d
+```
+
+### Accessing the Application
+
+Once the containers are running, the application is accessible at:
+- **SMS Checker**: [http://localhost:8080/sms](http://localhost:8080/sms)
+- **About Page (Lib Version Info)**: [http://localhost:8080/about](http://localhost:8080/about)
+
+### ⚙️ Configuration (.env)
+
+The setup is highly configurable via the `.env` file. Below is a detailed description of all available environment variables:
+
+| Variable | Default Value | Description |
+| :--- | :--- | :--- |
+| **Images** | | |
+| `APP_IMAGE` | `ghcr.io/doda2025-team20/app:latest` | The container image for the frontend application. |
+| `MODEL_IMAGE` | `ghcr.io/doda2025-team20/model-service:latest` | The container image for the backend model service. |
+| **Ports** | | |
+| `APP_PORT` | `8080` | The internal port on which the app service listens. |
+| `MODEL_PORT` | `8081` | The internal port on which the model service listens. |
+| `HOST_APP_PORT` | `8080` | The port on your host machine that maps to the app service. |
+| **Service Wiring** | | |
+| `MODEL_HOST` | `http://model-service:8081` | The URL used by the app service to communicate with the model service internally. |
+| **Model Service Config** | | |
+| `MODEL_URL` | *(Latest Release URL)* | URL to download the model zip file. If empty, the service uses its internal default. |
+| `DEBUG` | `false` | Enables Flask debug mode in the model service if set to `true`. |
+
+### 💾 Volume Mappings
+
+| Service           | Volume Mapping         | Description                                                                                                                                  |
+| ----------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **model-service** | `./output:/sms/output` | Directory for model used by `model-service`. Will be automatically populated on first startup if empty, otherwise its contents will be used. |
+
+---
+
+## ▶️ Kubernetes Deployment (Vagrant)
 
 In order to run the VMs, and set up the Kubernetes Cluster, you can do:
 
@@ -50,40 +104,6 @@ After that is done, we run `finalization.yaml` to set up MetalLB and Ingress:
 ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory playbooks/finalization.yaml
 ```
 
-The `docker-compose.yml` file in this repository orchestrates the deployment of the entire system. To deploy the application, ensure Docker and Docker Compose are installed. Download the `docker-compose.yml` file and run the following command in the terminal:
-
-```bash
-docker-compose up -d
-```
-
-The application will then be accessible at `http://localhost:8080`.
-
-The `docker-compose.yml` file specifies the use of container images for the **app** and **model-service** components, which are hosted on GitHub Container Registry, at `ghcr.io/doda2025-team20/app:latest` and `ghcr.io/doda2025-team20/model-service:latest`, respectively.
-
-The following sections detail the configurations that can be adjusted in the `docker-compose.yml` file.
-
-### 🚪 Ports
-
-| Service           | Default Port Mapping | Description                                                                |
-| ----------------- | -------------------- | -------------------------------------------------------------------------- |
-| **app-service**   | `8080:8080`          | Frontend application access point.                                         |
-| **model-service** | `8081:8081`          | Backend model service API endpoint, **not exposed externally by default**. |
-
-### ⚙️ Environment Variables
-
-| Service           | Environment Variable | Default Value               | Description                                                                                                        |
-| ----------------- | -------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| **app-service**   | `MODEL_HOST`         | `http://model-service:8081` | Complete URL of the model service for API requests. Use the internal Docker network hostname and port.             |
-|                   | `APP_PORT`           | `8080`                      | Port on which the app service listens internally. Ensure to update the relevant port mapping accordingly.          |
-| **model-service** | `MODEL_PORT`         | `8081`                      | Port on which the model service listens internally. Ensure to update the relevant port mapping accordingly.        |
-|                   | `MODEL_URL`          |                             | URL to download the model for the service. The empty default will download from the URL hard-coded in the service. |
-|                   | `DEBUG`              | `false`                     | Enable or disable the Flask debug mode.                                                                            |
-
-### 💾 Volume Mappings
-
-| Service           | Volume Mapping         | Description                                                                                                                                  |
-| ----------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| **model-service** | `./output:/sms/output` | Directory for model used by `model-service`. Will be automatically populated on first startup if empty, otherwise its contents will be used. |
 
 ---
 
