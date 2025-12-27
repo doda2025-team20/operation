@@ -8,14 +8,9 @@ metadata:
 data:
   app-metrics-dashboard.json: |
     {
-      "annotations": {
-        "list": []
-      },
+      "annotations": { "list": [] },
       "editable": true,
-      "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": null,
-      "links": [],
       "panels": [
         {
           "datasource": {
@@ -467,7 +462,7 @@ data:
           "type": "piechart"
         }
       ],
-      "refresh": "5s",
+      "refresh": "10s",
       "schemaVersion": 38,
       "tags": ["app-metrics", "sms"],
       "templating": {
@@ -522,16 +517,12 @@ data:
       "version": 1,
       "weekStart": ""
     }
+
   experimental-dashboard.json: |
     {
-      "annotations": {
-        "list": []
-      },
+      "annotations": { "list": [] },
       "editable": true,
-      "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": null,
-      "links": [],
       "panels": [
         {
           "datasource": {
@@ -905,7 +896,7 @@ data:
           "type": "piechart"
         }
       ],
-      "refresh": "10s",
+      "refresh": "30s",
       "schemaVersion": 38,
       "tags": ["experimental", "canary"],
       "templating": {
