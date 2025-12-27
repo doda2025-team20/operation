@@ -10,8 +10,8 @@ spec:
     {{- toYaml .Values.istio.gateway.ingressGatewaySelector | nindent 4 }}
   servers:
   - port:
-      number: 80
-      name: http
+      number: 8080
+      name: http2
       protocol: HTTP
     hosts:
     {{- range .Values.istio.gateway.hosts }}
