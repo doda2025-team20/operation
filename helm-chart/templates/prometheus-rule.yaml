@@ -3,16 +3,18 @@ kind: PrometheusRule
 metadata:
   name: sms-traffic-alert
   labels:
+    {{- include "helm-chart.labels" . | nindent 4 }}
+    # CRITICAL: Must match prometheus-operator's label selector
     release: monitoring
 spec:
   groups:
   - name: sms-app.rules
     rules:
     - alert: HighTrafficDetected
-      expr: sum(rate(sms_requests_total[1m])) * 60 > 15 # more than 15 per minute
+      expr: sum(rate(sms_requests_total[1m])) * 60 > 15
       for: 2m
       labels:
         severity: warning
       annotations:
-        summary: {{ `"High traffic on {{ $labels.instance }}"` | quote }}
-        description: {{`"SMS App is receiving {{ $value }} requests per minute."` | quote}}
+        summary: {{ `"High traffic detected on SMS application"` | quote }}
+        description: {{ `"SMS App is receiving {{ $value }} requests per minute (threshold: 15 req/min)."` | quote }}

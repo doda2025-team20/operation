@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Values.model.name }}-monitor
+  labels:
+    {{- include "helm-chart.labels" . | nindent 4 }}
+    app: {{ .Values.model.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.model.name }}
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 15s
+    relabelings:
+    - sourceLabels: [__meta_kubernetes_pod_label_version]
+      targetLabel: version
+    - sourceLabels: [__meta_kubernetes_pod_name]
+      targetLabel: pod

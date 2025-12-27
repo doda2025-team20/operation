@@ -1,3 +1,4 @@
+# V1 Deployment (Stable)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,10 +18,7 @@ spec:
       labels:
         app: {{ .Values.model.name }}
         version: v1
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/path: "/metrics"
-        prometheus.io/port: {{ .Values.model.port | quote }}
+      # REMOVED prometheus.io annotations - using ServiceMonitor instead
     spec:
       containers:
       - name: {{ .Values.model.name }}
@@ -66,10 +64,6 @@ spec:
       labels:
         app: {{ .Values.model.name }}
         version: v2
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/path: "/metrics"
-        prometheus.io/port: {{ .Values.model.port | quote }}
     spec:
       containers:
       - name: {{ .Values.model.name }}
@@ -83,7 +77,7 @@ spec:
         - name: model-output
           mountPath: {{ .Values.model.mountPath }}
       volumes:
-      - name: model-output
+      - name: model-output   # ✅ Removed the extra colon
         {{- if .Values.model.useHostPath }}
         hostPath:
           path: {{ .Values.model.hostPath }}
@@ -91,54 +85,5 @@ spec:
         {{- else }}
         persistentVolumeClaim:
           claimName: {{ .Values.model.name }}-pvc
-        {{- end }}
-{{- end }}
----
-{{- if .Values.model.shadow.enabled }}
-# Shadow Deployment
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ .Values.model.name }}-{{ .Values.model.shadow.tag }}
-  labels:
-    {{- include "helm-chart.labels" . | nindent 4 }}
-    app: {{ .Values.model.name }}
-    version: {{ .Values.model.shadow.tag }}
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: {{ .Values.model.name }}
-      version: {{ .Values.model.shadow.tag }}
-  template:
-    metadata:
-      labels:
-        app: {{ .Values.model.name }}
-        version: {{ .Values.model.shadow.tag }}
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/path: "/metrics"
-        prometheus.io/port: {{ .Values.model.port | quote }}
-    spec:
-      containers:
-        - name: {{ .Values.model.name }}
-          image: {{ .Values.model.shadow.image | default .Values.model.image}}
-          ports:
-            - containerPort: {{ .Values.model.port }}
-          env:
-            - name: VERSION
-              value: "{{ .Values.model.shadow.tag }}"
-          volumeMounts:
-            - name: model-output
-              mountPath: {{ .Values.model.mountPath }}
-      volumes:
-        - name: model-output
-        {{- if .Values.model.useHostPath }}
-          hostPath:
-            path: {{ .Values.model.hostPath }}
-            type: Directory
-        {{- else }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.model.name }}-pvc
         {{- end }}
 {{- end }}

@@ -1,5 +1,5 @@
 {{- if .Values.istio.enabled }}
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
   name: {{ .Values.model.name }}-vs
@@ -9,7 +9,6 @@ spec:
   hosts:
     - {{ .Values.model.name }}
   http:
-
   {{- if .Values.istio.canary.enabled }}
 
     # -----------------------
@@ -24,23 +23,6 @@ spec:
             host: {{ .Values.model.name }}
             subset: v2
           weight: {{ .Values.istio.canary.canaryWeight }}
-
-  {{- else if .Values.istio.shadow.enabled }}
-
-    # -----------------------
-    # Shadow launch (traffic mirroring)
-    # -----------------------
-    - route:
-        - destination:
-            host: {{ .Values.model.name }}
-            subset: v1
-          weight: 100
-      mirror:
-        destination:
-          host: {{ .Values.model.name }}
-          subset: {{ .Values.model.shadow.tag }}
-      mirrorPercentage:
-        value: {{ .Values.istio.shadow.mirrorPercentage }}
 
   {{- else }}
 
