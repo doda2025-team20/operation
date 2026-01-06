@@ -1,5 +1,5 @@
 {{- if .Values.istio.enabled }}
-apiVersion: networking.istio.io/v1beta1
+apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
   name: {{ .Values.app.name }}-dr
@@ -23,7 +23,6 @@ spec:
     - name: v1
       labels:
         version: v1
-
     {{- if .Values.istio.canary.enabled }}
     - name: v2
       labels:
