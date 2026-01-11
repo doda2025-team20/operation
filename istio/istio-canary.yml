@@ -137,7 +137,7 @@ spec:
   ports:
   - { name: http, port: 1234, targetPort: 8080 }
 ---
-apiVersion: networking.istio.io/v1beta1
+apiVersion: networking.istio.io/v1
 kind: Gateway
 metadata: { name: my-gateway }
 spec:
@@ -146,7 +146,7 @@ spec:
   - port: { number: 80, name: http, protocol: HTTP }
     hosts: [ "*" ]
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata: { name: my-entry-service }
 spec:
@@ -161,7 +161,7 @@ spec:
     - destination: { host: app, subset: v2 }
       weight: 10
 ---
-apiVersion: networking.istio.io/v1beta1
+apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata: { name: lib-dr }
 spec:
@@ -172,7 +172,7 @@ spec:
   - name: v2
     labels: { version: v2 }
 ---
-apiVersion: networking.istio.io/v1beta1
+apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata: { name: app-dr }
 spec:
@@ -183,7 +183,7 @@ spec:
   - name: v2
     labels: { version: v2 }
 ---
-apiVersion: networking.istio.io/v1beta1
+apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata: { name: lib-vs }
 spec:
