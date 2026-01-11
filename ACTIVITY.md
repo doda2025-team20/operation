@@ -1,6 +1,6 @@
 ### Week Q2.1 (Nov 10+)
 
-No work
+No activity
 
 ### Week Q2.2 (Nov 17+)
 
@@ -64,7 +64,7 @@ This week I worked on finishing the playbook for the istio and kubernetes dashbo
 I worked on the initial migration of the Docker Compose files to Kubernetes. I created a Helm chart for deploying the model and application services, which connects the app to the model server. The deployments utilize configurable variables for the name, image, and port, and the model service includes an optional shared folder.
 
 
-## Week Q2.5 (Dec 8+)
+### Week Q2.5 (Dec 8+)
 
 `Norah E. Milanesi`: https://github.com/doda2025-team20/operation/pull/18\
 This week, I focused on implementing Istio traffic management. I worked on configuring the Gateway and VirtualServices to route traffic to both v1 and v2 versions of the app-service and model-service, ensuring proper version-specific routing. I also set up DestinationRules and weights for canary deployments and verified sticky sessions for consistent request routing. Additionally, I troubleshot Minikube networking issues, tested service connectivity through the ingress, and documented the setup and troubleshooting steps for Istio integration.
@@ -77,3 +77,19 @@ This week I went back to our A2 submission, for which we had only an initial att
 
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/20\
 This week, I worked on implementing a shadow launch strategy for the model service using Istio. I modified the existing VirtualService configuration to include traffic mirroring from the stable version (v1) to the newer shadown version (v3) of the model service. This setup allows us to test the new version under real traffic conditions without impacting the user experience. Additionally, I worked on writing documentation for our entire deployment strategies, including both canary deployment and shadow launch.
+
+
+### Week Q2.6 (Dec 15+)
+
+
+### Week Q2.7 (Dec 22+, Christmas Break)
+No activity
+
+
+### Week Q2.8 (Dec 29+, Christmas Break)
+No activity
+
+
+### Week Q2.9 (Jan 5+)
+`Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/26\
+Worked on properly reimplementing the sticky session routing using a `canary` cookie in Istio, as the previous implementation was for pod-level sticky sessions and did not work as intended for sticky versions. The new implementation ensures that users are consistently routed to the same version of the app-service based on the `canary` cookie, enhancing the user experience during canary deployments. For the time being, this is to be tested by manually setting the cookie in the browser, however implementation of automatic cookie setting in the frontend is in the works.
