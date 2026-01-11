@@ -12,7 +12,29 @@ spec:
   {{- range .Values.istio.gateway.hosts }}
   - {{ . | quote }}
   {{- end }}
+
   http:
+  # v1 Cookie
+  - match:
+    - headers:
+        cookie:
+          regex: ".*canary=v1.*"
+    route:
+    - destination:
+        host: {{ .Values.app.name }}
+        subset: v1
+
+  # v2 Cookie
+  - match:
+    - headers:
+        cookie:
+          regex: ".*canary=v2.*"
+    route:
+    - destination:
+        host: {{ .Values.app.name }}
+        subset: v2
+
+  # Default routing
   - match:
     - uri:
         prefix: /
