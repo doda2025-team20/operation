@@ -93,3 +93,6 @@ No activity
 ### Week Q2.9 (Jan 5+)
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/26\
 Worked on properly reimplementing the sticky session routing using a `canary` cookie in Istio, as the previous implementation was for pod-level sticky sessions and did not work as intended for sticky versions. The new implementation ensures that users are consistently routed to the same version of the app-service based on the `canary` cookie, enhancing the user experience during canary deployments. For the time being, this is to be tested by manually setting the cookie in the browser, however implementation of automatic cookie setting in the frontend is in the works.
+
+`Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/29\
+This week I changed the Vagrantfile and the ansible playbooks so that the /etc/hosts file in each node is dynamically generated. Beforehand we had a hardcoded /infra/playbooks/hosts file that was manually copied into each of the nodes, and now we use ansible.builtin.blockinfile to create the /etc/hosts file dynamically instead.
