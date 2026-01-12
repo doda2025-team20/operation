@@ -83,6 +83,166 @@ helm install assignment-release helm-chart/ -f my-values.yaml
 ```
 
 
+## Prerequisites
+
+### Minikube must be running
+The Kubernetes API must be reachable before installing the Helm chart. If Minikube is not started, Helm will fail with errors such as:
+
+```bash
+kubernetes cluster unreachable: dial tcp 127.0.0.1:xxxxx: connect: connection refused
+```
+
+
+
+Start Minikube:
+
+```bash
+minikube start
+````
+
+Verify the cluster is reachable:
+
+```bash
+kubectl get nodes
+```
+
+### Prometheus Operator CRDs must be installed
+
+This chart includes resources such as `AlertmanagerConfig` and `PrometheusRule`, which belong to the Prometheus Operator API group (`monitoring.coreos.com`). These will fail unless the Prometheus Operator (commonly installed via `kube-prometheus-stack`) is present.
+
+Install the CRDs by installing the stack:
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install monitoring prometheus-community/kube-prometheus-stack
+```
+
+Verify that the CRDs exist:
+
+```bash
+kubectl get crds | grep monitoring.coreos.com
+```
+
+If these are missing, Helm will report errors such as:
+
+```
+no matches for kind "AlertmanagerConfig"
+ensure CRDs are installed first
+```
+
+## Installing the Helm Chart
+
+After ensuring that Minikube is running and the Prometheus Operator CRDs are installed, install the chart:
+
+```bash
+helm install assignment-release ./helm-chart
+```
+
+# Istio Deployment
+
+This section describes how to deploy the application with Istio for traffic management, canary releases, and monitoring.
+
+## Prerequisites
+
+- Istio must be installed in your cluster. You can use Istio’s official Helm chart or `istioctl install`.
+- Ensure the `default` namespace has sidecar injection enabled:
+
+```bash
+kubectl label namespace default istio-injection=enabled
+```
+
+* Verify Istio system pods are running:
+
+```bash
+kubectl get pods -n istio-system
+```
+
+## Deploying with Istio
+
+After installing the Helm chart for the app:
+
+1. **Verify the Istio ingress gateway:**
+
+```bash
+kubectl get svc -n istio-system istio-ingressgateway
+```
+
+* This service exposes the application externally via ports 80/443.
+* minikube must be running:
+
+```bash
+minikube tunnel
+```
+
+3. **Accessing the app via Istio:**
+
+```bash
+curl -v http://<ISTIO_INGRESS_IP>/ # Should be 127.0.0.1
+```
+
+* Replace `<ISTIO_INGRESS_IP>` with IP of `istio-ingressgateway` under `EXTERNAL-IP`.
+
+4. **Testing v1/v2 routing:**
+
+* Confirm both versions of `app-service` are registered with Istio:
+
+```bash
+istioctl proxy-config endpoints <INGRESS_GATEWAY_POD> -n istio-system | grep app-service
+```
+
+* To get the INGRESS_GATEWAY_POD run:
+
+```bash
+kubectl get pods -n istio-system -l istio=ingressgateway
+```
+
+* Sample output should include endpoints for `v1` and `v2`.
+
+* To verify sticky sessions:
+
+```bash
+cookie=$(curl -v -s http://<ISTIO_INGRESS_IP>/ 2>&1 | grep "set-cookie" | cut -d: -f2- | xargs)
+for i in {1..10}; do curl -s --header "Cookie: $cookie" http://<ISTIO_INGRESS_IP>/; echo; done
+```
+
+Requests with the same cookie should consistently hit the same version of the service.
+
+To view to which version of the service the request was routed to, open and inspect the logs:
+
+```bash
+kubectl logs -l app=app-service -c istio-proxy -f
+```
+
+## Troubleshooting
+
+* **`kubectl run` fails or pod deleted immediately:**
+  Use a supported image like `curlimages/curl` and ensure the namespace is not restricted.
+
+* **Ingress gateway reports 503:**
+
+  * Check that app pods are healthy and sidecars are injected.
+  * Verify that the virtual service and destination rules are applied.
+
+```bash
+kubectl get virtualservice
+kubectl get destinationrule
+```
+
+* **Istioctl commands fail to find pods:**
+  Ensure you are using the correct namespace and pod name:
+
+```bash
+kubectl get pod -n istio-system -l istio=ingressgateway
+```
+
+## Notes
+
+* Always keep the `minikube tunnel` terminal open for LoadBalancer access.
+* For canary deployments, you can adjust traffic split by updating the `DestinationRule` and `VirtualService` objects for `app-service`.
+
+
+
 # Grafana Monitoring Setup
 
 ## Overview
