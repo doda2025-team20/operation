@@ -81,6 +81,9 @@ This week, I worked on implementing a shadow launch strategy for the model servi
 
 ### Week Q2.6 (Dec 15+)
 
+`Norah E. Milanesi`: https://github.com/doda2025-team20/operation/pull/25\
+This week I worked on adding full monitoring support for the application by integrating Prometheus metrics with Grafana dashboards. The dashboards were configured to display the required metrics using multiple visualizations, including gauges, time series, bar charts, and pie charts, covering request rates, classification counts, confidence scores, and latency. Additional panels were created to clearly show traffic distribution and behavior between the stable (v1) and canary (v2) versions. To ensure accurate latency calculations, the MetricsController in the app repository was updated to expose cumulative histogram buckets, allowing Prometheus and Grafana to aggregate and display the metrics correctly as traffic is generated.
+
 
 ### Week Q2.7 (Dec 22+, Christmas Break)
 No activity
