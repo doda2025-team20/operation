@@ -1,3 +1,4 @@
+# V1 Deployment (Stable)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,10 +18,6 @@ spec:
       labels:
         app: {{ .Values.app.name }}
         version: v1
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/path: "/metrics"
-        prometheus.io/port: {{ .Values.app.port | quote }}
     spec:
       containers:
       - name: {{ .Values.app.name }}
@@ -55,10 +52,7 @@ spec:
       labels:
         app: {{ .Values.app.name }}
         version: v2
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/path: "/metrics"
-        prometheus.io/port: {{ .Values.app.port | quote }}
+      # REMOVED prometheus.io annotations - using ServiceMonitor instead
     spec:
       containers:
       - name: {{ .Values.app.name }}

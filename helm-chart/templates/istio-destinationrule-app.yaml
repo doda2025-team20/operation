@@ -1,12 +1,14 @@
 {{- if .Values.istio.enabled }}
-apiVersion: networking.istio.io/v1beta1
+apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
   name: {{ .Values.app.name }}-dr
   labels:
     {{- include "helm-chart.labels" . | nindent 4 }}
 spec:
-  host: {{ .Values.app.name }}
+  # Fully-qualified service name avoids namespace-related routing issues
+  host: {{ .Values.app.name }}.{{ .Release.Namespace }}.svc.cluster.local
+
   {{- if .Values.istio.canary.stickySession.enabled }}
   trafficPolicy:
     loadBalancer:
@@ -14,14 +16,23 @@ spec:
         httpCookie:
           name: {{ .Values.istio.canary.stickySession.cookieName }}
           ttl: 3600s
+    # Optional resilience settings (disabled unless explicitly configured)
+    {{- if .Values.istio.outlierDetection.enabled }}
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 5s
+      baseEjectionTime: 30s
+    {{- end }}
   {{- end }}
+
+  # Version-based subsets used by VirtualService routing
   subsets:
-  - name: v1
-    labels:
-      version: v1
-  {{- if .Values.istio.canary.enabled }}
-  - name: v2
-    labels:
-      version: v2
-  {{- end }}
+    - name: v1
+      labels:
+        version: v1
+    {{- if .Values.istio.canary.enabled }}
+    - name: v2
+      labels:
+        version: v2
+    {{- end }}
 {{- end }}
