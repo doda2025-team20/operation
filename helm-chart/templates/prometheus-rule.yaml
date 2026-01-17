@@ -15,6 +15,16 @@ spec:
       for: 2m
       labels:
         severity: warning
+        namespace: {{ .Release.Namespace }}
       annotations:
         summary: {{ `"High traffic detected on SMS application"` | quote }}
         description: {{ `"SMS App is receiving {{ $value }} requests per minute (threshold: 15 req/min)."` | quote }}
+  # Uncomment the following block to enable a test alert
+  # - name: test
+  #   rules:
+  #   - alert: EmailTest
+  #     expr: vector(1)
+  #     for: 15s
+  #     labels:
+  #       namespace: {{ .Release.Namespace }}
+  #       severity: critical
