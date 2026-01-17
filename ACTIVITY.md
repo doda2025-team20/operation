@@ -94,3 +94,6 @@ Worked on properly reimplementing the sticky session routing using a `canary` co
 This week I changed the Vagrantfile and the ansible playbooks so that the /etc/hosts file in each node is dynamically generated. Beforehand we had a hardcoded /infra/playbooks/hosts file that was manually copied into each of the nodes, and now we use ansible.builtin.blockinfile to create the /etc/hosts file dynamically instead.
 
 ### Week Q2.8 (Jan 12+)
+
+`Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/32\
+This week I worked on thoroughly testing and reconfiguring the AlertManager setup, which was not properly functioning before. Alerts configured in Prometheus Rules would not reach the email receiver due to misconfigurations in the matchers and routing tree, leading them to always reach the default `null` receiver. Instead, Kubernetes cluster alerts were only being routed. The routing tree was restructured to ensure all alerts from Prometheus Rules in the release namespace (`default`) reach the email receiver. Further, I rewrote the Helm template for the AlertManager configuration to improve readability and maintainability, and use the values from `values.yml` properly. Finally, I tested the entire alerting flow by creating a test alert in Prometheus Rules and verifying that it was received via email.
