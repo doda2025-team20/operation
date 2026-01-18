@@ -1,98 +1,99 @@
 # SMS Checker – Project Overview & Repository Guide
 
-This repository (**operation**) serves as the entry point for the **SMS Checker** project.
-The project is organized as a set of independent components that communicate via REST APIs. Each component is developed in its own repository. The overall architecture is gradually being evolved from a minimal working prototype into a fully modular, containerized system.
+This repository (**operation**) serves as the main entry point for the **SMS Checker** project.
+The project is organized as a set of independent components that communicate via REST APIs. Each component is developed in its own repository and released independently. Over the course of the project, the architecture evolved from a minimal prototype into a containerized system with Kubernetes, ingress, service mesh, and monitoring support.
 
 ![Project Architecture](assets/image.png)
 
-## 📦 Repository Structure
+---
+
+## Repository Structure
 
 The organization consists of the following repositories:
 
-| Component         | Description                                         | Repository                                                                                                           |
-| ----------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| **operation**     | Entrypoint / meta-repository linking all components | [https://github.com/doda2025-team20/operation/tree/a1](https://github.com/doda2025-team20/operation/tree/a1)         |
-| **model-service** | Backend service providing the model API             | [https://github.com/doda2025-team20/model-service/tree/a1](https://github.com/doda2025-team20/model-service/tree/a1) |
-| **app**           | Frontend application consuming backend APIs         | [https://github.com/doda2025-team20/app/tree/a1](https://github.com/doda2025-team20/app/tree/a1)                     |
-| **lib-version**   | Version-aware library                               | [https://github.com/doda2025-team20/lib-version/tree/a1](https://github.com/doda2025-team20/lib-version/tree/a1)     |
+| Component         | Description                                | Repository                                                                                           |
+| ----------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| **operation**     | Infrastructure, deployment, and operations | [https://github.com/doda2025-team20/operation/tree/a4](https://github.com/doda2025-team20/operation/tree/a4)         |
+| **model-service** | Backend ML inference service               | [https://github.com/doda2025-team20/model-service/tree/a4](https://github.com/doda2025-team20/model-service/tree/a4) |
+| **app**           | Frontend application and API gateway       | [https://github.com/doda2025-team20/app/tree/a4](https://github.com/doda2025-team20/app/tree/a4)                     |
+| **lib-version**   | Version-aware shared library               | [https://github.com/doda2025-team20/lib-version/tree/a4](https://github.com/doda2025-team20/lib-version/tree/a4)     |
 
-Each component is intended to be built, released, and deployed independently.
-
-## 🚀 Project Context
-
-The SMS Checker application currently includes only minimal functionality: a simple HTML/JavaScript frontend connected to a trivial backend.
-Initially, the frontend is served through Spring Boot, with an API gateway forwarding requests to the model service to avoid cross-site scripting issues.
-
-Throughout the course, the architecture is extended so that all components operate independently and interact solely via REST APIs or shared, versioned dependencies.
-The **app** and **model-service** components are expected to be released as separate container images, deployable independently.
-A version-aware library (**lib-version**) will also be introduced to demonstrate dependency versioning and reuse.
+Each component is built, versioned, and deployed independently.
 
 ---
 
-## 🐳 Docker Compose Setup
+## Project Context
 
-The `docker-compose.yml` file in this repository orchestrates the deployment of the entire system for local development and testing.
+The SMS Checker application initially consisted of a simple HTML/JavaScript frontend connected to a trivial backend.
+Early versions served the frontend via Spring Boot, using an API gateway to forward requests to the model service and avoid cross-site scripting issues.
+
+Throughout the course, the system was extended to:
+
+* run all components as standalone container images
+* communicate exclusively via REST APIs or shared versioned libraries
+* support both local execution (Docker Compose) and Kubernetes-based deployment
+* include ingress, traffic management, and monitoring
+
+---
+
+## Local Development (Docker Compose)
+
+For local development and testing, the entire system can be started using Docker Compose.
 
 ### Prerequisites
-Ensure you have Docker and Docker Compose installed.
 
-### Running the Application
+* Docker
+* Docker Compose
 
-You can start the application using either Docker Compose v2 (recommended) or v1.
+### Running the application
 
-**Using Docker Compose v2:**
 ```bash
 docker compose up -d
 ```
 
-**Using Docker Compose v1:**
-```bash
-docker-compose up -d
-```
+### Accessing the application
 
-### Accessing the Application
+* **SMS Checker**: [http://localhost:8080/sms](http://localhost:8080/sms)
+* **About page (lib-version info)**: [http://localhost:8080/about](http://localhost:8080/about)
 
-Once the containers are running, the application is accessible at:
-- **SMS Checker**: [http://localhost:8080/sms](http://localhost:8080/sms)
-- **About Page (Lib Version Info)**: [http://localhost:8080/about](http://localhost:8080/about)
+### Configuration (`.env`)
 
-### ⚙️ Configuration (.env)
+The deployment is configurable via the `.env` file:
 
-The setup is highly configurable via the `.env` file. Below is a detailed description of all available environment variables:
+| Variable        | Default                                        | Description          |
+| --------------- | ---------------------------------------------- | -------------------- |
+| `APP_IMAGE`     | `ghcr.io/doda2025-team20/app:latest`           | Frontend image       |
+| `MODEL_IMAGE`   | `ghcr.io/doda2025-team20/model-service:latest` | Backend image        |
+| `APP_PORT`      | `8080`                                         | App container port   |
+| `MODEL_PORT`    | `8081`                                         | Model container port |
+| `HOST_APP_PORT` | `8080`                                         | Host port            |
+| `MODEL_HOST`    | `http://model-service:8081`                    | App -> model routing  |
+| `MODEL_URL`     | latest release                                 | Model download URL   |
+| `DEBUG`         | `false`                                        | Flask debug mode     |
 
-| Variable | Default Value | Description |
-| :--- | :--- | :--- |
-| **Images** | | |
-| `APP_IMAGE` | `ghcr.io/doda2025-team20/app:latest` | The container image for the frontend application. |
-| `MODEL_IMAGE` | `ghcr.io/doda2025-team20/model-service:latest` | The container image for the backend model service. |
-| **Ports** | | |
-| `APP_PORT` | `8080` | The internal port on which the app service listens. |
-| `MODEL_PORT` | `8081` | The internal port on which the model service listens. |
-| `HOST_APP_PORT` | `8080` | The port on your host machine that maps to the app service. |
-| **Service Wiring** | | |
-| `MODEL_HOST` | `http://model-service:8081` | The URL used by the app service to communicate with the model service internally. |
-| **Model Service Config** | | |
-| `MODEL_URL` | *(Latest Release URL)* | URL to download the model zip file. If empty, the service uses its internal default. |
-| `DEBUG` | `false` | Enables Flask debug mode in the model service if set to `true`. |
+### Volumes
 
-### 💾 Volume Mappings
-
-| Service           | Volume Mapping         | Description                                                                                                                                  |
-| ----------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| **model-service** | `./output:/sms/output` | Directory for model used by `model-service`. Will be automatically populated on first startup if empty, otherwise its contents will be used. |
+| Service       | Mapping                | Purpose                 |
+| ------------- | ---------------------- | ----------------------- |
+| model-service | `./output:/sms/output` | Persisted model storage |
 
 ---
 
-## ▶️ Kubernetes Deployment (Vagrant)
+### Cluster Provisioning (Vagrant + Ansible)
 
-In order to run the VMs, and set up the Kubernetes Cluster, you can do:
+To provision a Kubernetes cluster locally using virtual machines:
 
 ```bash
 cd infra
 vagrant up
 ```
 
-This will create a ctrl VM and two worker node VMs. After that is finished, you need to get the proper tools and then run the finalization.yaml playbook in order to set up MetalLB load balancer and Ingress. Before that make sure you have the community.kubernetes collection installed:
+This creates:
+
+* one control-plane node
+* two worker nodes
+
+After this is finished, you need to get the proper tools and then run the `finalization.yaml` playbook in order to set up **MetalLB** load balancer and **Ingress**. Before that make sure you have the `community.kubernetes` collection installed:
 
 ```bash
 ansible-galaxy collection install community.kubernetes
@@ -104,10 +105,97 @@ After that is done, we run `finalization.yaml` to set up MetalLB and Ingress:
 ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory playbooks/finalization.yaml
 ```
 
+All Kubernetes tooling, access instructions, and operational details are documented here:
+
+* **Cluster services & tooling** -> [`infra/k8s/README.md`](./infra/k8s/README.md)
 
 ---
 
-## ⚠️ Upcoming Changes
+## Kubernetes Application Deployment (Helm)
+
+The SMS Checker application is deployed to Kubernetes using a **single Helm chart** located in `helm-chart/`.
+
+### What the Helm chart installs
+
+* App and model Deployments and Services
+* Istio Gateway, VirtualServices, and DestinationRules
+* Prometheus `ServiceMonitor` resources
+* Prometheus alert rules
+* Grafana with pre-provisioned dashboards and datasources
+* Secrets and ConfigMaps for configuration
+
+Detailed Helm usage, prerequisites, and verification steps are documented here:
+
+* **Helm chart, monitoring & dashboards** -> [`helm-chart/README.md`](./helm-chart/README.md)
+
+---
+
+## Accessing the Application via Ingress
+
+### Istio Ingress (Kubernetes)
+
+After installing Istio and deploying the Helm chart:
+
+```bash
+kubectl get svc -n istio-system istio-ingressgateway
+```
+
+Retrieve the external IP or port (depending on environment).
+
+#### Minikube
+
+```bash
+minikube service istio-ingressgateway -n istio-system --url
+```
+
+Then access:
+
+```
+http://<INGRESS_ADDRESS>/sms
+```
+
+Metrics are available at:
+
+```
+http://<INGRESS_ADDRESS>/metrics
+```
+
+---
+
+## Monitoring: Prometheus & Grafana
+
+Monitoring is deployed as part of the Helm chart.
+
+### Prometheus
+
+* Scrapes metrics exposed by both app and model services
+* Uses `ServiceMonitor` resources
+* Includes alert rules
+
+Example metrics:
+
+* `sms_requests_total`
+* `sms_last_confidence`
+* `sms_request_duration_seconds`
+
+### Grafana
+
+* Automatically provisioned dashboards
+* Prometheus datasource configured via ConfigMaps
+
+Access instructions and dashboard descriptions are available in:
+
+* `helm-chart/README.md`
+
+---
+
+## Additional Documentation
+
+* **Team activity log**: `ACTIVITY.md`
+
+---
+
+## Ongoing Evolution
 
 The repository layout and startup procedures will be updated as the architectural extensions are introduced.
 This README will be maintained to reflect those changes.
