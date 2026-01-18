@@ -54,6 +54,8 @@ istio:
       istio: ingressgateway
     hosts:
       - "*"
+  outlierDetection:
+    enabled: false
   canary:
     enabled: true
     stableWeight: 90
