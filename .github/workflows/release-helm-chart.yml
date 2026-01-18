@@ -1,0 +1,21 @@
+name: Release Helm chart (GHCR OCI)
+
+on:
+  workflow_dispatch:
+
+  push:
+    paths:
+      - "helm-chart/**"
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    uses: doda2025-team20/build-tools/.github/workflows/publish-helm-chart.yml@main
+    permissions:
+      contents: read
+      packages: write
+    with:
+      chart_dir: "helm-chart"
+      registry: "ghcr.io"
+      repository: "doda2025-team20/team20-helm"
