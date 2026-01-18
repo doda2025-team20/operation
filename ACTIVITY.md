@@ -100,3 +100,6 @@ This week I worked on thoroughly testing and reconfiguring the AlertManager setu
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/35\
 This week I identified andfixed a shadow launch issue. While in our values.yaml we had already defined shadow.enables, shadow.image, shadow.tag, shadow.mirrorPercentage, we had an undefined outlierDetection.enabled, which was causing an error. Furthermore, the model service deployment was not deploying the shadow version, and therefore the shadow pod didn't exist to receive mirrored traffic. Finally, I added the traffic mirroring configuration to the model service virtual service.
+
+`Norah E. Milanesi`:https://github.com/doda2025-team20/operation/pull/37
+This week, I improved the project README based on peer feedback, adding clear instructions for accessing the application via Istio Ingress, linking detailed READMEs to avoid duplication, and clarifying the roles of Helm, Prometheus, and Grafana. I also updated repository links and reorganized the content for a clearer flow from local deployment to Kubernetes monitoring. All changes were documentation-only.
