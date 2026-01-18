@@ -107,7 +107,7 @@ ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inve
 
 All Kubernetes tooling, access instructions, and operational details are documented here:
 
-* **Cluster services & tooling** -> `infra/k8s/README.md`
+* **Cluster services & tooling** -> [`infra/k8s/README.md`](./infra/k8s/README.md)
 
 ---
 
@@ -126,7 +126,7 @@ The SMS Checker application is deployed to Kubernetes using a **single Helm char
 
 Detailed Helm usage, prerequisites, and verification steps are documented here:
 
-* **Helm chart, monitoring & dashboards** -> `helm-chart/README.md`
+* **Helm chart, monitoring & dashboards** -> [`helm-chart/README.md`](./helm-chart/README.md)
 
 ---
 
