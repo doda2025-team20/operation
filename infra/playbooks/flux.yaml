@@ -59,11 +59,11 @@
       ansible.builtin.shell: |
         set -euo pipefail
         if command -v flux >/dev/null 2>&1; then
-          flux version
+          flux --version
           exit 0
         fi
-        curl -fsSL {{ flux_install_script_url }} | bash
-        flux version
+        curl -fsSL https://fluxcd.io/install.sh | bash
+        flux --version
       args:
         executable: /bin/bash
       changed_when: false

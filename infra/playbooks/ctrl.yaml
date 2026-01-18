@@ -154,3 +154,31 @@
             helm plugin install https://github.com/databus23/helm-diff
           become_user: vagrant
           when: "'diff' not in helm_plugins_vagrant.stdout"
+
+    - name: Read current CoreDNS Corefile
+      ansible.builtin.command: kubectl -n kube-system get configmap coredns -o jsonpath='{.data.Corefile}'
+      register: coredns_corefile
+      changed_when: false
+
+    - name: Patch CoreDNS to use public resolvers (only if using /etc/resolv.conf)
+      ansible.builtin.shell: |
+        set -euo pipefail
+        kubectl -n kube-system get configmap coredns -o yaml \
+        | sed 's|forward \. /etc/resolv\.conf {|forward . 1.1.1.1 8.8.8.8 {|g' \
+        | kubectl apply -f -
+        kubectl -n kube-system rollout restart deployment coredns
+        kubectl -n kube-system rollout status deployment coredns --timeout=180s
+      args:
+        executable: /bin/bash
+      when: "'forward . /etc/resolv.conf' in coredns_corefile.stdout"
+
+    - name: Smoke test DNS from a pod (best-effort)
+      ansible.builtin.shell: |
+        set -euo pipefail
+        kubectl run -n default dns-test --rm -i --restart=Never --image=busybox:1.36 -- \
+          sh -c "nslookup github.com >/dev/null && echo OK"
+      args:
+        executable: /bin/bash
+      register: dns_smoke
+      changed_when: false
+      failed_when: false
