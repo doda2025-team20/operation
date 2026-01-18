@@ -67,7 +67,7 @@ istio:
     enabled: true
     mirrorPercentage: 100
   outlierDetection:
-    enabled: false
+    enabled: true
 
 
 # Prometheus Configuration
@@ -82,7 +82,12 @@ prometheus:
 # AlertManager Configuration
 alertmanager:
   enabled: true
-  smtpPassword: dummy-password-123  # Placeholder
+  # To test the below you can use Gmail SMTP settings with your own
+  # email as sender and receiver. You need to use an App Password
+  # of Gmail, not your regular password. See:
+  # https://support.google.com/accounts/answer/185833?hl=en
+  # Alternatively, use another SMTP server of your choice.
+  smtpPassword: dummy-password-123
   smtpUsername: user1@gmail.com
   smtpHost: smtp.gmail.com:587
   emailFrom: alertmanager@doda.com
