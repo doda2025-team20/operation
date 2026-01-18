@@ -103,3 +103,6 @@ This week I identified andfixed a shadow launch issue. While in our values.yaml 
 
 `Norah E. Milanesi`:https://github.com/doda2025-team20/operation/pull/37
 This week, I improved the project README based on peer feedback, adding clear instructions for accessing the application via Istio Ingress, linking detailed READMEs to avoid duplication, and clarifying the roles of Helm, Prometheus, and Grafana. I also updated repository links and reorganized the content for a clearer flow from local deployment to Kubernetes monitoring. All changes were documentation-only.
+
+`Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/31 && https://github.com/doda2025-team20/operation/pull/34
+This week, I worked on documenting extension proposal, and also provide an implementation for it. The extension consists of using GitOps for managing the cluster configuration, as well as automating the deployment of the application using FluxCD. I created a sample repository that contains the helm chart, as well as the configuration required for deploying the application using FluxCD. I also wrote documentation that explains why this extension was chosen. I also added a pipeline that automatically releases a new version of the application helm chart, everytime there is a new change in the chart repository.
