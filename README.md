@@ -67,7 +67,7 @@ The deployment is configurable via the `.env` file:
 | `APP_PORT`      | `8080`                                         | App container port   |
 | `MODEL_PORT`    | `8081`                                         | Model container port |
 | `HOST_APP_PORT` | `8080`                                         | Host port            |
-| `MODEL_HOST`    | `http://model-service:8081`                    | App → model routing  |
+| `MODEL_HOST`    | `http://model-service:8081`                    | App -> model routing  |
 | `MODEL_URL`     | latest release                                 | Model download URL   |
 | `DEBUG`         | `false`                                        | Flask debug mode     |
 
