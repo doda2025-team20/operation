@@ -64,6 +64,8 @@ istio:
   shadow:
     enabled: true
     mirrorPercentage: 100
+  outlierDetection:
+    enabled: false
 
 
 # Prometheus Configuration
