@@ -85,17 +85,24 @@ This week, I worked on implementing a shadow launch strategy for the model servi
 This week I worked on adding full monitoring support for the application by integrating Prometheus metrics with Grafana dashboards. The dashboards were configured to display the required metrics using multiple visualizations, including gauges, time series, bar charts, and pie charts, covering request rates, classification counts, confidence scores, and latency. Additional panels were created to clearly show traffic distribution and behavior between the stable (v1) and canary (v2) versions. To ensure accurate latency calculations, the MetricsController in the app repository was updated to expose cumulative histogram buckets, allowing Prometheus and Grafana to aggregate and display the metrics correctly as traffic is generated.
 
 
-### Week Q2.7 (Dec 22+, Christmas Break)
-No activity
+### Week Q2.7 (Jan 5+)
 
-
-### Week Q2.8 (Dec 29+, Christmas Break)
-No activity
-
-
-### Week Q2.9 (Jan 5+)
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/26\
 Worked on properly reimplementing the sticky session routing using a `canary` cookie in Istio, as the previous implementation was for pod-level sticky sessions and did not work as intended for sticky versions. The new implementation ensures that users are consistently routed to the same version of the app-service based on the `canary` cookie, enhancing the user experience during canary deployments. For the time being, this is to be tested by manually setting the cookie in the browser, however implementation of automatic cookie setting in the frontend is in the works.
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/29\
 This week I changed the Vagrantfile and the ansible playbooks so that the /etc/hosts file in each node is dynamically generated. Beforehand we had a hardcoded /infra/playbooks/hosts file that was manually copied into each of the nodes, and now we use ansible.builtin.blockinfile to create the /etc/hosts file dynamically instead.
+
+### Week Q2.8 (Jan 12+)
+
+`Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/32\
+This week I worked on thoroughly testing and reconfiguring the AlertManager setup, which was not properly functioning before. Alerts configured in Prometheus Rules would not reach the email receiver due to misconfigurations in the matchers and routing tree, leading them to always reach the default `null` receiver. Instead, Kubernetes cluster alerts were only being routed. The routing tree was restructured to ensure all alerts from Prometheus Rules in the release namespace (`default`) reach the email receiver. Further, I rewrote the Helm template for the AlertManager configuration to improve readability and maintainability, and use the values from `values.yml` properly. Finally, I tested the entire alerting flow by creating a test alert in Prometheus Rules and verifying that it was received via email.
+
+`Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/35\
+This week I identified andfixed a shadow launch issue. While in our values.yaml we had already defined shadow.enables, shadow.image, shadow.tag, shadow.mirrorPercentage, we had an undefined outlierDetection.enabled, which was causing an error. Furthermore, the model service deployment was not deploying the shadow version, and therefore the shadow pod didn't exist to receive mirrored traffic. Finally, I added the traffic mirroring configuration to the model service virtual service.
+
+`Norah E. Milanesi`:https://github.com/doda2025-team20/operation/pull/37
+This week, I improved the project README based on peer feedback, adding clear instructions for accessing the application via Istio Ingress, linking detailed READMEs to avoid duplication, and clarifying the roles of Helm, Prometheus, and Grafana. I also updated repository links and reorganized the content for a clearer flow from local deployment to Kubernetes monitoring. All changes were documentation-only.
+
+`Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/31 && https://github.com/doda2025-team20/operation/pull/34
+This week, I worked on documenting extension proposal, and also provide an implementation for it. The extension consists of using GitOps for managing the cluster configuration, as well as automating the deployment of the application using FluxCD. I created a sample repository that contains the helm chart, as well as the configuration required for deploying the application using FluxCD. I also wrote documentation that explains why this extension was chosen. I also added a pipeline that automatically releases a new version of the application helm chart, everytime there is a new change in the chart repository.
