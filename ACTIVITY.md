@@ -50,6 +50,7 @@ This week, I worked on the initial files required for setting up the kubernetes 
 https://github.com/doda2025-team20/model-service/pull/10 (Extra commit w2, compensation for w3)
 
 **PRs Approved:**
+
 TBD
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/10
