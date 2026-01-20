@@ -103,7 +103,7 @@ This week, I worked on implementing a shadow launch strategy for the model servi
 
 **PRs Created:**
 
-https://github.com/doda2025-team20/lib-version/pull/4
+https://github.com/doda2025-team20/model-service/pull/11
 
 **PRs Approved:**
 
