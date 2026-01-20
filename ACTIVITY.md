@@ -25,7 +25,6 @@ I worked on the initial implementation of the `lib-version` library. Additionall
 
 https://github.com/doda2025-team20/lib-version/pull/4
 
-https://github.com/doda2025-team20/model-service/pull/10 (compensation w3)
 
 **PRs Approved:**
 
@@ -48,11 +47,10 @@ This week, I worked on the initial files required for setting up the kubernetes 
 
 **PRs Created:**
 
-https://github.com/doda2025-team20/lib-version/pull/4
+https://github.com/doda2025-team20/model-service/pull/10 (compensation w3)
 
 **PRs Approved:**
-
-https://github.com/doda2025-team20/model-service/pull/7
+TBD
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/10
 This week I added the initial implementation of the worker nodes's playbook, as well as an initial version of the finalization playbook for MetalLB and Ingres.
