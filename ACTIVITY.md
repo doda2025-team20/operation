@@ -83,7 +83,7 @@ https://github.com/doda2025-team20/app/pull/7
 
 **PRs Approved:**
 
-https://github.com/doda2025-team20/model-service/pull/7
+https://github.com/doda2025-team20/operation/pull/15
 
 ### Week Q2.5 (Dec 8 -14)
 
@@ -107,7 +107,9 @@ https://github.com/doda2025-team20/model-service/pull/11
 
 **PRs Approved:**
 
-https://github.com/doda2025-team20/model-service/pull/7
+https://github.com/doda2025-team20/operation/pull/20
+
+https://github.com/doda2025-team20/operation/pull/18
 
 ### Week Q2.6 (Dec 15 - Dec 21)
 
@@ -163,3 +165,5 @@ https://github.com/doda2025-team20/operation/pull/36
 **PRs Approved:**
 
 https://github.com/doda2025-team20/operation/pull/32
+
+https://github.com/doda2025-team20/app/pull/11
