@@ -44,9 +44,15 @@ After that shared foundation, I focused on implementing some provisioning steps 
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/6\
 This week, I worked on the initial files required for setting up the kubernetes dashboard, as well as istio installation using helm. Additionally, I worked on documenting the steps required to access the kubernetes dashboard securely using kubectl port-forwarding and a bearer token. I also added some sample files for creating an istio gateway. Will provide extra ansible playbooks for installing istio and the dashboard.
 
-'Moegiez Bhatti':
-PR Created: https://github.com/doda2025-team20/lib-version/pull/4
-PR Approved: https://github.com/doda2025-team20/model-service/pull/7
+`Moegiez Bhatti`: 
+
+**PRs Created:**
+
+https://github.com/doda2025-team20/lib-version/pull/4
+
+**PRs Approved:**
+
+https://github.com/doda2025-team20/model-service/pull/7
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/10
 This week I added the initial implementation of the worker nodes's playbook, as well as an initial version of the finalization playbook for MetalLB and Ingres.
@@ -71,6 +77,15 @@ This week I worked on finishing the playbook for the istio and kubernetes dashbo
 `Petre-Alexandru Hautelman`: https://github.com/doda2025-team20/operation/pull/12
 I worked on the initial migration of the Docker Compose files to Kubernetes. I created a Helm chart for deploying the model and application services, which connects the app to the model server. The deployments utilize configurable variables for the name, image, and port, and the model service includes an optional shared folder.
 
+`Moegiez Bhatti`: TO BE SPECIFIED
+
+**PRs Created:**
+
+https://github.com/doda2025-team20/lib-version/pull/4
+
+**PRs Approved:**
+
+https://github.com/doda2025-team20/model-service/pull/7
 
 ### Week Q2.5 (Dec 8 -14)
 
@@ -86,12 +101,30 @@ This week I went back to our A2 submission, for which we had only an initial att
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/20\
 This week, I worked on implementing a shadow launch strategy for the model service using Istio. I modified the existing VirtualService configuration to include traffic mirroring from the stable version (v1) to the newer shadown version (v3) of the model service. This setup allows us to test the new version under real traffic conditions without impacting the user experience. Additionally, I worked on writing documentation for our entire deployment strategies, including both canary deployment and shadow launch.
 
+`Moegiez Bhatti`: TO BE SPECIFIED
+
+**PRs Created:**
+
+https://github.com/doda2025-team20/lib-version/pull/4
+
+**PRs Approved:**
+
+https://github.com/doda2025-team20/model-service/pull/7
 
 ### Week Q2.6 (Dec 15 - Dec 21)
 
 `Norah E. Milanesi`: https://github.com/doda2025-team20/operation/pull/25\
 This week I worked on adding full monitoring support for the application by integrating Prometheus metrics with Grafana dashboards. The dashboards were configured to display the required metrics using multiple visualizations, including gauges, time series, bar charts, and pie charts, covering request rates, classification counts, confidence scores, and latency. Additional panels were created to clearly show traffic distribution and behavior between the stable (v1) and canary (v2) versions. To ensure accurate latency calculations, the MetricsController in the app repository was updated to expose cumulative histogram buckets, allowing Prometheus and Grafana to aggregate and display the metrics correctly as traffic is generated.
 
+`Moegiez Bhatti`: TO BE SPECIFIED
+
+**PRs Created:**
+
+https://github.com/doda2025-team20/lib-version/pull/4
+
+**PRs Approved:**
+
+https://github.com/doda2025-team20/model-service/pull/7
 
 ### Week Q2.7 (Jan 5 - Jan 11)
 
@@ -100,6 +133,16 @@ Worked on properly reimplementing the sticky session routing using a `canary` co
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/29\
 This week I changed the Vagrantfile and the ansible playbooks so that the /etc/hosts file in each node is dynamically generated. Beforehand we had a hardcoded /infra/playbooks/hosts file that was manually copied into each of the nodes, and now we use ansible.builtin.blockinfile to create the /etc/hosts file dynamically instead.
+
+`Moegiez Bhatti`: TO BE SPECIFIED
+
+**PRs Created:**
+
+https://github.com/doda2025-team20/lib-version/pull/4
+
+**PRs Approved:**
+
+https://github.com/doda2025-team20/model-service/pull/7
 
 ### Week Q2.8 (Jan 12 - 18)
 
@@ -114,3 +157,14 @@ This week, I improved the project README based on peer feedback, adding clear in
 
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/31 && https://github.com/doda2025-team20/operation/pull/34
 This week, I worked on documenting extension proposal, and also provide an implementation for it. The extension consists of using GitOps for managing the cluster configuration, as well as automating the deployment of the application using FluxCD. I created a sample repository that contains the helm chart, as well as the configuration required for deploying the application using FluxCD. I also wrote documentation that explains why this extension was chosen. I also added a pipeline that automatically releases a new version of the application helm chart, everytime there is a new change in the chart repository.
+
+`Moegiez Bhatti`: TO BE SPECIFIED
+
+**PRs Created:**
+
+https://github.com/doda2025-team20/lib-version/pull/4
+
+**PRs Approved:**
+
+https://github.com/doda2025-team20/model-service/pull/7
+
