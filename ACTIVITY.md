@@ -47,7 +47,7 @@ This week, I worked on the initial files required for setting up the kubernetes 
 
 **PRs Created:**
 
-https://github.com/doda2025-team20/model-service/pull/10 (compensation w3)
+https://github.com/doda2025-team20/model-service/pull/10 (Extra commit w2, compensation for w3)
 
 **PRs Approved:**
 TBD
