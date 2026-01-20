@@ -126,6 +126,10 @@ https://github.com/doda2025-team20/operation/pull/24
 **PRs Approved:**
 
 (https://github.com/doda2025-team20/operation/pull/25)
+
+https://github.com/doda2025-team20/app/pull/11
+
+
 ### Week Q2.7 (Jan 5 - Jan 11)
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/26\
@@ -166,5 +170,3 @@ https://github.com/doda2025-team20/operation/pull/36
 **PRs Approved:**
 
 https://github.com/doda2025-team20/operation/pull/32
-
-https://github.com/doda2025-team20/app/pull/11
