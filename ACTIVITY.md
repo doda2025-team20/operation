@@ -25,7 +25,7 @@ I worked on the initial implementation of the `lib-version` library. Additionall
 
 https://github.com/doda2025-team20/lib-version/pull/4
 
-https://github.com/doda2025-team20/model-service/pull/10
+https://github.com/doda2025-team20/model-service/pull/10 (compensation w3)
 
 **PRs Approved:**
 
@@ -81,7 +81,7 @@ I worked on the initial migration of the Docker Compose files to Kubernetes. I c
 
 **PRs Created:**
 
-https://github.com/doda2025-team20/lib-version/pull/4
+https://github.com/doda2025-team20/app/pull/7
 
 **PRs Approved:**
 
@@ -120,7 +120,7 @@ This week I worked on adding full monitoring support for the application by inte
 
 **PRs Created:**
 
-https://github.com/doda2025-team20/lib-version/pull/4
+https://github.com/doda2025-team20/operation/pull/24
 
 **PRs Approved:**
 
@@ -138,7 +138,7 @@ This week I changed the Vagrantfile and the ansible playbooks so that the /etc/h
 
 **PRs Created:**
 
-https://github.com/doda2025-team20/lib-version/pull/4
+https://github.com/doda2025-team20/operation/pull/28
 
 **PRs Approved:**
 
@@ -162,7 +162,7 @@ This week, I worked on documenting extension proposal, and also provide an imple
 
 **PRs Created:**
 
-https://github.com/doda2025-team20/lib-version/pull/4
+https://github.com/doda2025-team20/operation/pull/36
 
 **PRs Approved:**
 
