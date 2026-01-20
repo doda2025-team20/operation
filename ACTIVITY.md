@@ -21,12 +21,12 @@ I worked on the initial implementation of the `lib-version` library. Additionall
 
 `Moegiez Bhatti`: 
 
-PRs Created: 
+**PRs Created:**
 https://github.com/doda2025-team20/lib-version/pull/4
 
 https://github.com/doda2025-team20/model-service/pull/10
 
-PRs Approved: 
+**PRs Approved:**
 https://github.com/doda2025-team20/model-service/pull/7
 
 
