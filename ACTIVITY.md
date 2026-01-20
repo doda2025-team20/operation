@@ -51,7 +51,7 @@ https://github.com/doda2025-team20/model-service/pull/10 (Extra commit w2, compe
 
 **PRs Approved:**
 
-TBD
+TBD (extra approval in w10)
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/10
 This week I added the initial implementation of the worker nodes's playbook, as well as an initial version of the finalization playbook for MetalLB and Ingres.
