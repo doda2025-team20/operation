@@ -46,13 +46,14 @@
         - { name: 'net.bridge.bridge-nf-call-iptables', value: 1 }
         - { name: 'net.bridge.bridge-nf-call-ip6tables', value: 1 }
 
-    - name: 1.1.8 - Add /etc/hosts entries for name resolution
+    - name: 1.1.8 - Add /etc/hosts entries for name resolution (dynamic)
       ansible.builtin.blockinfile:
         path: /etc/hosts
+        create: true
+        marker: "# {mark} ANSIBLE MANAGED CLUSTER HOSTS"
         block: |
-          192.168.56.100 ctrl
-          {% for i in range(1, (worker_count | default(2) | int) + 1) %}
-          192.168.56.{{ 100 + i }} node-{{ i }}
+          {% for h in groups['all'] %}
+          {{ hostvars[h].ansible_host }} {{ h }}
           {% endfor %}
 
 
@@ -87,16 +88,18 @@
           ansible.builtin.apt:
             update_cache: yes
 
-    - name: 1.1.10 - Install K8s tools (explicit latest A2 versions)
-      ansible.builtin.apt:
-        update_cache: yes
-        allow_downgrade: yes
-        pkg:
-          - "containerd=1.7.24*"
-          - "runc=1.1.12*"
-          - "kubeadm=1.32.4*"
-          - "kubelet=1.32.4*"
-          - "kubectl=1.32.4*"
+    - name: 1.1.10 - Install K8s tools (allow changing held packages)
+      ansible.builtin.shell: |
+        set -euo pipefail
+        apt-get update
+        apt-get -y --allow-downgrades --allow-change-held-packages install \
+          "containerd=1.7.24*" \
+          "runc=1.1.12*" \
+          "kubeadm=1.32.4*" \
+          "kubelet=1.32.4*" \
+          "kubectl=1.32.4*"
+      args:
+        executable: /bin/bash
 
     - name: 1.1.11 - Configure Containerd
       block:

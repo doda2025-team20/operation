@@ -1,0 +1,131 @@
+---
+- hosts: ctrl
+  become: true
+  vars:
+    # Kubeconfig on the controller VM
+    kubeconfig_path: /home/vagrant/.kube/config
+
+    # Flux bootstrap target
+    flux_owner: doda2025-team20
+    flux_repository: team20-flux
+    flux_branch: master
+    flux_path: clusters/dev
+    flux_personal: false
+
+    # Ensure image automation controllers are installed
+    flux_components_extra: "image-reflector-controller,image-automation-controller"
+
+    flux_install_script_url: https://fluxcd.io/install.sh
+
+    github_token: ""
+
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+
+  tasks:
+    # ---------------------------------------------------------------------------
+    # Sanity check kubeconfig
+    # ---------------------------------------------------------------------------
+    - name: Ensure kubeconfig exists on controller
+      ansible.builtin.stat:
+        path: "{{ kubeconfig_path }}"
+      register: kubeconfig_stat
+
+    - name: Fail if kubeconfig is missing
+      ansible.builtin.fail:
+        msg: "Kubeconfig {{ kubeconfig_path }} does not exist on ctrl."
+      when: not kubeconfig_stat.stat.exists
+
+    - name: Ensure cluster is reachable
+      ansible.builtin.command: kubectl get nodes
+      changed_when: false
+
+    # ---------------------------------------------------------------------------
+    # Prereqs
+    # ---------------------------------------------------------------------------
+    - name: Install prerequisites
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - git
+        state: present
+        update_cache: true
+
+    # ---------------------------------------------------------------------------
+    # Flux CLI
+    # ---------------------------------------------------------------------------
+    - name: Install flux CLI if missing
+      ansible.builtin.shell: |
+        set -euo pipefail
+        if command -v flux >/dev/null 2>&1; then
+          flux --version
+          exit 0
+        fi
+        curl -fsSL https://fluxcd.io/install.sh | bash
+        flux --version
+      args:
+        executable: /bin/bash
+      changed_when: false
+
+    # ---------------------------------------------------------------------------
+    # Token persistence (only if provided via playbook var)
+    # ---------------------------------------------------------------------------
+    - name: Persist GITHUB_TOKEN on controller (only if github_token provided)
+      ansible.builtin.copy:
+        dest: /etc/profile.d/github_token.sh
+        mode: "0600"
+        content: |
+          export GITHUB_TOKEN="{{ github_token }}"
+      when: github_token | length > 0
+
+    - name: Print instructions to set token manually (if not provided)
+      ansible.builtin.debug:
+        msg: |
+          GITHUB_TOKEN is not configured by Ansible (github_token var is empty).
+          To set it on ctrl, run:
+
+            echo 'export GITHUB_TOKEN=ghp_XXXX' | sudo tee /etc/profile.d/github_token.sh
+            sudo chmod 600 /etc/profile.d/github_token.sh
+            source /etc/profile.d/github_token.sh
+
+          Then re-run this playbook (or run flux bootstrap manually).
+      when: github_token | length == 0
+
+    # ---------------------------------------------------------------------------
+    # Flux bootstrap (only when token exists on VM, either written above or set manually)
+    # ---------------------------------------------------------------------------
+    - name: Check if token file exists on controller
+      ansible.builtin.stat:
+        path: /etc/profile.d/github_token.sh
+      register: token_file
+
+    - name: Bootstrap Flux (skips if token not available)
+      ansible.builtin.shell: |
+        set -euo pipefail
+        source /etc/profile.d/github_token.sh
+
+        flux bootstrap github \
+          --token-auth \
+          --owner {{ flux_owner }} \
+          --repository {{ flux_repository }} \
+          --branch {{ flux_branch }} \
+          --path {{ flux_path }} \
+          {% if flux_personal | bool %}--personal{% else %}--personal=false{% endif %} \
+          --components-extra={{ flux_components_extra }}
+      args:
+        executable: /bin/bash
+      when: token_file.stat.exists
+
+    # ---------------------------------------------------------------------------
+    # Post-checks
+    # ---------------------------------------------------------------------------
+    - name: Show Flux controllers
+      ansible.builtin.command: kubectl -n flux-system get deploy
+      changed_when: false
+      when: token_file.stat.exists
+
+    - name: Show Flux kustomizations
+      ansible.builtin.command: flux get kustomizations -A
+      changed_when: false
+      when: token_file.stat.exists

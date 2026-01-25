@@ -2,7 +2,7 @@
 
 No activity
 
-### Week Q2.2 (Nov 17+)
+### Week Q2.2 (Nov 17 - Nov 23)
 
 `Norah E. Milanesi`: https://github.com/doda2025-team20/app/pull/1\
 During this week I collaborated with *Konstantinos* and together we worked on containerizing both frontend and backend, supporting multiple architectures, stages and making them flexible.
@@ -19,12 +19,19 @@ This week, I worked on containerizing the `model-service` backend. I created the
 `Petre-Alexandru Hautelman`: [lib-version](https://github.com/doda2025-team20/lib-version/pull/1), [app](https://github.com/doda2025-team20/app/pull/4/files)\
 I worked on the initial implementation of the `lib-version` library. Additionally, I focused on installing and integrating the library into the `app` project. This involved making modifications to the `app` Dockerfile and the GitHub workflow, such that the Maven m2 secrets are not included in the published Docker image.
 
-`Moegiez Bhatti`:
-PR Created: [https://github.com/doda2025-team20/lib-version/pull/4](https://github.com/doda2025-team20/model-service/pull/10)
+`Moegiez Bhatti`: 
 
-PR Approved: https://github.com/doda2025-team20/model-service/pull/7
+**PRs Created:**
 
-### Week Q2.3 (Nov 24+)
+https://github.com/doda2025-team20/lib-version/pull/4
+
+
+**PRs Approved:**
+
+https://github.com/doda2025-team20/model-service/pull/7
+
+
+### Week Q2.3 (Nov 24 - Nov 30)
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/7\
 This week, I worked along with *Norah* on preparing the Infrastructure-as-Code (IaC) for our Kubernetes cluster. Using Vagrant and Ansible, I mainly worked on creating a customizable setup to create a local VM cluster with one controller node and N worker nodes. I also made provisioning configuration that prepares all the nodes with the required setup to install Kubernetes, including disabling swap and proper network configuration. Additionally, I worked more closely with *Norah* on brainstorming and preparing the rest of the Ansible provisioning, to actually install K8s and configure containerd, making the general playbook ready for the others to specialize to the controller and worker nodes.
@@ -36,9 +43,15 @@ After that shared foundation, I focused on implementing some provisioning steps 
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/6\
 This week, I worked on the initial files required for setting up the kubernetes dashboard, as well as istio installation using helm. Additionally, I worked on documenting the steps required to access the kubernetes dashboard securely using kubectl port-forwarding and a bearer token. I also added some sample files for creating an istio gateway. Will provide extra ansible playbooks for installing istio and the dashboard.
 
-'Moegiez Bhatti':
-PR Created: https://github.com/doda2025-team20/lib-version/pull/4
-PR Approved: https://github.com/doda2025-team20/model-service/pull/7
+`Moegiez Bhatti`: 
+
+**PRs Created:**
+
+https://github.com/doda2025-team20/model-service/pull/10 (Extra commit w2, compensation for w3)
+
+**PRs Approved:**
+
+TBD (extra approval in w10)
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/10
 This week I added the initial implementation of the worker nodes's playbook, as well as an initial version of the finalization playbook for MetalLB and Ingres.
@@ -46,7 +59,7 @@ This week I added the initial implementation of the worker nodes's playbook, as 
 `Petre-Alexandru Hautelman`: https://github.com/doda2025-team20/operation/pull/9
 Worked together with Moegiez to implement the Kubernetes controller playbook, steps 13-17 of the assignment.
 
-### Week Q2.4 (Dec 1+)
+### Week Q2.4 (Dec 1 - Dec 7)
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/14\
 This week I took care of migrating our Docker Compose configuration file to one that can be used with Kubernetes on a cluster. I created a configuration with two separate deployments, one for the frontend and one for the backend, allowing them to scale independently. Each deployment has its associated service, and the frontend service is also connected to an ingress. Finally, each deployment has its own ConfigMap, allowing for independent configuration directly through the cluster, and the backend deployment includes a volume mapping for model persistency.
@@ -63,8 +76,17 @@ This week I worked on finishing the playbook for the istio and kubernetes dashbo
 `Petre-Alexandru Hautelman`: https://github.com/doda2025-team20/operation/pull/12
 I worked on the initial migration of the Docker Compose files to Kubernetes. I created a Helm chart for deploying the model and application services, which connects the app to the model server. The deployments utilize configurable variables for the name, image, and port, and the model service includes an optional shared folder.
 
+`Moegiez Bhatti`: TO BE SPECIFIED
 
-### Week Q2.5 (Dec 8+)
+**PRs Created:**
+
+https://github.com/doda2025-team20/app/pull/7
+
+**PRs Approved:**
+
+https://github.com/doda2025-team20/operation/pull/15
+
+### Week Q2.5 (Dec 8 -14)
 
 `Norah E. Milanesi`: https://github.com/doda2025-team20/operation/pull/18\
 This week, I focused on implementing Istio traffic management. I worked on configuring the Gateway and VirtualServices to route traffic to both v1 and v2 versions of the app-service and model-service, ensuring proper version-specific routing. I also set up DestinationRules and weights for canary deployments and verified sticky sessions for consistent request routing. Additionally, I troubleshot Minikube networking issues, tested service connectivity through the ingress, and documented the setup and troubleshooting steps for Istio integration.
@@ -78,14 +100,37 @@ This week I went back to our A2 submission, for which we had only an initial att
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/20\
 This week, I worked on implementing a shadow launch strategy for the model service using Istio. I modified the existing VirtualService configuration to include traffic mirroring from the stable version (v1) to the newer shadown version (v3) of the model service. This setup allows us to test the new version under real traffic conditions without impacting the user experience. Additionally, I worked on writing documentation for our entire deployment strategies, including both canary deployment and shadow launch.
 
+`Moegiez Bhatti`: TO BE SPECIFIED
 
-### Week Q2.6 (Dec 15+)
+**PRs Created:**
+
+https://github.com/doda2025-team20/model-service/pull/11
+
+**PRs Approved:**
+
+https://github.com/doda2025-team20/operation/pull/20
+
+https://github.com/doda2025-team20/operation/pull/18
+
+### Week Q2.6 (Dec 15 - Dec 21)
 
 `Norah E. Milanesi`: https://github.com/doda2025-team20/operation/pull/25\
 This week I worked on adding full monitoring support for the application by integrating Prometheus metrics with Grafana dashboards. The dashboards were configured to display the required metrics using multiple visualizations, including gauges, time series, bar charts, and pie charts, covering request rates, classification counts, confidence scores, and latency. Additional panels were created to clearly show traffic distribution and behavior between the stable (v1) and canary (v2) versions. To ensure accurate latency calculations, the MetricsController in the app repository was updated to expose cumulative histogram buckets, allowing Prometheus and Grafana to aggregate and display the metrics correctly as traffic is generated.
 
+`Moegiez Bhatti`: TO BE SPECIFIED
 
-### Week Q2.7 (Jan 5+)
+**PRs Created:**
+
+https://github.com/doda2025-team20/operation/pull/24
+
+**PRs Approved:**
+
+(https://github.com/doda2025-team20/operation/pull/25)
+
+https://github.com/doda2025-team20/app/pull/11
+
+
+### Week Q2.7 (Jan 5 - Jan 11)
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/26\
 Worked on properly reimplementing the sticky session routing using a `canary` cookie in Istio, as the previous implementation was for pod-level sticky sessions and did not work as intended for sticky versions. The new implementation ensures that users are consistently routed to the same version of the app-service based on the `canary` cookie, enhancing the user experience during canary deployments. For the time being, this is to be tested by manually setting the cookie in the browser, however implementation of automatic cookie setting in the frontend is in the works.
@@ -93,7 +138,16 @@ Worked on properly reimplementing the sticky session routing using a `canary` co
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/29\
 This week I changed the Vagrantfile and the ansible playbooks so that the /etc/hosts file in each node is dynamically generated. Beforehand we had a hardcoded /infra/playbooks/hosts file that was manually copied into each of the nodes, and now we use ansible.builtin.blockinfile to create the /etc/hosts file dynamically instead.
 
-### Week Q2.8 (Jan 12+)
+`Moegiez Bhatti`: TO BE SPECIFIED
+
+**PRs Created:**
+
+https://github.com/doda2025-team20/operation/pull/28
+
+**PRs Approved:**
+
+(https://github.com/doda2025-team20/operation/pull/27)
+### Week Q2.8 (Jan 12 - 18)
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/32\
 This week I worked on thoroughly testing and reconfiguring the AlertManager setup, which was not properly functioning before. Alerts configured in Prometheus Rules would not reach the email receiver due to misconfigurations in the matchers and routing tree, leading them to always reach the default `null` receiver. Instead, Kubernetes cluster alerts were only being routed. The routing tree was restructured to ensure all alerts from Prometheus Rules in the release namespace (`default`) reach the email receiver. Further, I rewrote the Helm template for the AlertManager configuration to improve readability and maintainability, and use the values from `values.yml` properly. Finally, I tested the entire alerting flow by creating a test alert in Prometheus Rules and verifying that it was received via email.
@@ -115,3 +169,13 @@ This week I improved the SMS spam detection system's observability and metrics a
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/39\
 This week I worked on documentation mainly for assignment 4. I looked at our docs/deployment.md file and fixed some inconsistencies regarding the shadow launch deployment. I also described our usage of sticky sessions for consistent user experience, as well as the option to manually set a canary cookie as a developer in order to use another deployment of the application. In our main README.md, I included information about our extension - GitOps with Flux. Finally, I explained our deployments, service mesh, and traffic management using Istio, including implementation and architecture. 
+
+`Moegiez Bhatti`: TO BE SPECIFIED
+
+**PRs Created:**
+
+https://github.com/doda2025-team20/operation/pull/36
+
+**PRs Approved:**
+
+https://github.com/doda2025-team20/operation/pull/32
