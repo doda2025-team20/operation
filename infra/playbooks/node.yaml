@@ -8,9 +8,15 @@
       run_once: true
       register: join_command_result
 
-    - name: Set join command fact (for all hosts)
+    - name: Store join command as fact on ctrl
       ansible.builtin.set_fact:
-        kubeadm_join_cmd: "{{ hostvars['ctrl'].join_command_result.stdout }}"
+        kubeadm_join_cmd: "{{ join_command_result.stdout }}"
+      delegate_to: ctrl
+      run_once: true
+
+    - name: Read join command fact (workers)
+      ansible.builtin.set_fact:
+        kubeadm_join_cmd: "{{ hostvars['ctrl'].kubeadm_join_cmd }}"
       when: inventory_hostname != "ctrl"
 
     - name: Check if node is already joined
