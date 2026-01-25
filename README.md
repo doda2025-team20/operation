@@ -98,8 +98,11 @@ After this is finished, you need to get the proper tools and then run the `final
 ```bash
 ansible-galaxy collection install community.kubernetes
 ```
-
-After that is done, we run `finalization.yaml` to set up MetalLB and Ingress:
+If Ansible Galaxy returns an HTTP 500 error, install the collection directly from GitHub instead:
+```bash
+ansible-galaxy collection install "git+https://github.com/ansible-collections/community.kubernetes.git,2.0.0" --force
+```
+After installation is verified, we run `finalization.yaml` to set up MetalLB and Ingress:
 
 ```bash
 ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory playbooks/finalization.yaml
