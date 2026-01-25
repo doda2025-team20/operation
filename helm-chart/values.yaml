@@ -1,0 +1,85 @@
+app:
+  name: app-service
+  image: ghcr.io/doda2025-team20/app:latest
+  port: 8080
+  canary:
+    enabled: true
+    image: ghcr.io/doda2025-team20/app-sandbox:0.0.5-alpha
+    tag: v2
+
+model:
+  name: model-service
+  image: ghcr.io/doda2025-team20/model-service:latest
+  port: 8081
+
+  # Choose hostPath (true) to use the VM shared folder mounted into each VM.
+  # If false, k8 will use the PVC (see model-service-claim0-persistentvolumeclaim.yaml)
+  useHostPath: false
+
+  # only used when useHostPath == true
+  hostPath: /mnt/shared
+
+  # only used when useHostPath == false
+  storage: 100Mi
+
+  mountPath: /sms/output
+  canary:
+    enabled: false
+    image: ghcr.io/doda2025-team20/model-service:latest
+    tag: v2
+
+  shadow:
+    enabled: true
+    image: ghcr.io/doda2025-team20/model-service:latest
+    tag: v3
+
+grafana:
+  image:
+    repository: grafana/grafana
+    tag: "10.0.0"
+    pullPolicy: IfNotPresent
+  
+  adminSecretName: grafana-admin-secret
+  adminUser: admin
+  adminPassword: password123
+  
+  ingress:
+    enabled: false
+
+istio:
+  enabled: true
+  gateway:
+    name: my-gateway
+    ingressGatewaySelector:
+      istio: ingressgateway
+    hosts:
+      - "*"
+  canary:
+    enabled: true
+    stableWeight: 90
+    canaryWeight: 10
+    stickySession:
+      enabled: true
+      cookieName: user-session
+  shadow:
+    enabled: true
+    mirrorPercentage: 100
+
+
+# Prometheus Configuration
+prometheus:
+  enabled: true
+  image:
+    repository: prom/prometheus
+    tag: v2.48.0
+  service:
+    port: 9090
+
+# AlertManager Configuration
+alertmanager:
+  enabled: true
+  smtpPassword: dummy-password-123  # Placeholder
+  smtpUsername: user1@gmail.com
+  smtpHost: smtp.gmail.com:587
+  emailFrom: alertmanager@doda.com
+  emailTo: admin@doda.com
