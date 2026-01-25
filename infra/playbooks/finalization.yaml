@@ -87,3 +87,67 @@
             service:
               loadBalancerIP: 192.168.56.90
       become: false
+
+    - name: Add Istio Helm repository
+      community.kubernetes.helm_repository:
+        name: istio
+        repo_url: https://istio-release.storage.googleapis.com/charts
+        state: present
+      become: false
+
+    - name: Add Prometheus Community Helm repository
+      community.kubernetes.helm_repository:
+        name: prometheus-community
+        repo_url: https://prometheus-community.github.io/helm-charts
+        state: present
+      become: false
+
+    - name: Install Istio Base
+      community.kubernetes.helm:
+        kubeconfig: "{{ kubeconfig_path }}"
+        name: istio-base
+        chart_ref: istio/base
+        release_namespace: istio-system
+        create_namespace: yes
+        state: present
+      become: false
+
+    - name: Install Istiod
+      community.kubernetes.helm:
+        kubeconfig: "{{ kubeconfig_path }}"
+        name: istiod
+        chart_ref: istio/istiod
+        release_namespace: istio-system
+        create_namespace: yes
+        state: present
+        wait: true
+      become: false
+
+    - name: Install Istio Ingress Gateway
+      community.kubernetes.helm:
+        kubeconfig: "{{ kubeconfig_path }}"
+        name: istio-ingressgateway
+        chart_ref: istio/gateway
+        release_namespace: istio-system
+        create_namespace: yes
+        state: present
+        values:
+          service:
+            type: LoadBalancer
+            loadBalancerIP: 192.168.56.91
+      become: false
+
+    - name: Install Kube Prometheus Stack
+      community.kubernetes.helm:
+        kubeconfig: "{{ kubeconfig_path }}"
+        name: monitoring
+        chart_ref: prometheus-community/kube-prometheus-stack
+        release_namespace: monitoring
+        create_namespace: yes
+        state: present
+        values:
+          grafana:
+            service:
+              type: LoadBalancer
+              loadBalancerIP: 192.168.56.92
+      become: false
