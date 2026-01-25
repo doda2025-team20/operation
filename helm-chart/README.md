@@ -132,8 +132,15 @@ curl http://127.0.0.1:<INGRESS_PORT>/metrics | grep sms_
 
 ### Access Grafana
 
+Grafana should be available at `http://localhost/grafana` either through Nginx Ingress or Istio. In case it is not accessible, you can port-forward the service.
+
 ```bash
-minikube service assignment-release-helm-chart-grafana --url
+kubectl port-forward svc/assignment-release-grafana 3000:80
+```
+
+With Minikube:
+```bash
+minikube service assignment-release-grafana --url
 ```
 
 Login:
