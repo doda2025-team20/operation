@@ -54,6 +54,25 @@
             group: root
             mode: '0644'
 
+    - name: "Also set kubeconfig for root (so become:true kubectl works)"
+      block:
+        - name: "Ensure /root/.kube exists"
+          ansible.builtin.file:
+            path: /root/.kube
+            state: directory
+            owner: root
+            group: root
+            mode: '0700'
+
+        - name: "Copy admin.conf to root kubeconfig"
+          ansible.builtin.copy:
+            src: /etc/kubernetes/admin.conf
+            dest: /root/.kube/config
+            remote_src: yes
+            owner: root
+            group: root
+            mode: '0600'
+            
     - name: "1.1.15 - Create Flannel Pod Network"
       block:
         - name: "Download Flannel Pod Network YAML"
