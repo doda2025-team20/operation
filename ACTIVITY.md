@@ -170,3 +170,12 @@ https://github.com/doda2025-team20/operation/pull/36
 **PRs Approved:**
 
 https://github.com/doda2025-team20/operation/pull/32
+
+
+### Week Q2.9 (Jan 19+)
+
+`Norah E. Milanesi`: https://github.com/doda2025-team20/model-service/pull/13\
+This week I improved the SMS spam detection system's observability and metrics accuracy by adding confidence score calculation to the model service to return actual prediction probabilities instead of placeholder values. I also updated the frontend to integrate these dynamic confidence scores and added version labels to all Prometheus metrics for better tracking across deployments.
+
+`Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/39\
+This week I worked on documentation mainly for assignment 4. I looked at our docs/deployment.md file and fixed some inconsistencies regarding the shadow launch deployment. I also described our usage of sticky sessions for consistent user experience, as well as the option to manually set a canary cookie as a developer in order to use another deployment of the application. In our main README.md, I included information about our extension - GitOps with Flux. Finally, I explained our deployments, service mesh, and traffic management using Istio, including implementation and architecture. 
