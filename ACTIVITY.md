@@ -106,3 +106,9 @@ This week, I improved the project README based on peer feedback, adding clear in
 
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/31 && https://github.com/doda2025-team20/operation/pull/34
 This week, I worked on documenting extension proposal, and also provide an implementation for it. The extension consists of using GitOps for managing the cluster configuration, as well as automating the deployment of the application using FluxCD. I created a sample repository that contains the helm chart, as well as the configuration required for deploying the application using FluxCD. I also wrote documentation that explains why this extension was chosen. I also added a pipeline that automatically releases a new version of the application helm chart, everytime there is a new change in the chart repository.
+
+
+### Week Q2.9 (Jan 19+)
+
+`Norah E. Milanesi`: https://github.com/doda2025-team20/model-service/pull/13\
+This week I improved the SMS spam detection system's observability and metrics accuracy by adding confidence score calculation to the model service to return actual prediction probabilities instead of placeholder values. I also updated the frontend to integrate these dynamic confidence scores and added version labels to all Prometheus metrics for better tracking across deployments.
