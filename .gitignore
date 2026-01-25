@@ -6,3 +6,5 @@ output/
 
 vagrant/kubeconfig
 kubeconfig
+
+charts/

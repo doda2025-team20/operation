@@ -33,18 +33,14 @@ model:
     image: ghcr.io/doda2025-team20/model-service:latest
     tag: v3
 
-grafana:
-  image:
-    repository: grafana/grafana
-    tag: "10.0.0"
-    pullPolicy: IfNotPresent
-  
-  adminSecretName: grafana-admin-secret
-  adminUser: admin
-  adminPassword: password123
-  
-  ingress:
-    enabled: false
+kube-prometheus-stack:
+  grafana:
+    adminUser: admin
+    adminPassword: password123
+    grafana.ini:
+      server:
+        root_url: "%(protocol)s://%(domain)s/grafana"
+        serve_from_sub_path: true
 
 istio:
   enabled: true
@@ -55,7 +51,7 @@ istio:
     hosts:
       - "*"
   outlierDetection:
-    enabled: false
+    enabled: true
   canary:
     enabled: true
     stableWeight: 90
@@ -66,18 +62,6 @@ istio:
   shadow:
     enabled: true
     mirrorPercentage: 100
-  outlierDetection:
-    enabled: true
-
-
-# Prometheus Configuration
-prometheus:
-  enabled: true
-  image:
-    repository: prom/prometheus
-    tag: v2.48.0
-  service:
-    port: 9090
 
 # AlertManager Configuration
 alertmanager:
@@ -87,8 +71,17 @@ alertmanager:
   # of Gmail, not your regular password. See:
   # https://support.google.com/accounts/answer/185833?hl=en
   # Alternatively, use another SMTP server of your choice.
-  smtpPassword: dummy-password-123
+  smtpPassword: "dummy-password-123"
   smtpUsername: user1@gmail.com
   smtpHost: smtp.gmail.com:587
   emailFrom: alertmanager@doda.com
   emailTo: admin@doda.com
+
+# Prometheus Configuration (Legacy)
+# prometheus:
+#   enabled: true
+#   image:
+#     repository: prom/prometheus
+#     tag: v2.48.0
+#   service:
+#     port: 9090

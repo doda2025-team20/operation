@@ -6,6 +6,11 @@ The initial Helm templates were generated using `kompose convert` and then manua
 ---
 
 ## Installation
+### Prepare Helm Repositories
+
+```bash
+helm repo update
+```
 
 ### Lint the chart
 
@@ -16,6 +21,7 @@ helm lint helm-chart/
 ### Install the chart
 
 ```bash
+helm dependency update ./helm-chart
 helm install assignment-release ./helm-chart
 ```
 
@@ -45,7 +51,7 @@ kubectl get nodes
 
 ### Prometheus Operator
 
-This chart relies on `ServiceMonitor` resources, so the Prometheus Operator must be installed.
+This chart relies on `ServiceMonitor` resources, so the Prometheus Operator must be installed. It is included in the `kube-prometheus-stack` Helm chart, which is a dependency of this chart. In case it is not installed automatically, you can install it manually:
 
 ```bash
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -126,8 +132,15 @@ curl http://127.0.0.1:<INGRESS_PORT>/metrics | grep sms_
 
 ### Access Grafana
 
+Grafana should be available at `http://localhost/grafana` either through Nginx Ingress or Istio. In case it is not accessible, you can port-forward the service.
+
 ```bash
-minikube service assignment-release-helm-chart-grafana --url
+kubectl port-forward svc/assignment-release-grafana 3000:80
+```
+
+With Minikube:
+```bash
+minikube service assignment-release-grafana --url
 ```
 
 Login:
