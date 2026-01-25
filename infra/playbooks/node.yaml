@@ -12,6 +12,7 @@
       ansible.builtin.set_fact:
         kubeadm_join_cmd: "{{ join_command_result.stdout }}"
       delegate_to: ctrl
+      delegate_facts: true
       run_once: true
 
     - name: Read join command fact (workers)
