@@ -86,7 +86,7 @@ https://github.com/doda2025-team20/app/pull/7
 
 https://github.com/doda2025-team20/operation/pull/15
 
-### Week Q2.5 (Dec 8 -14)
+### Week Q2.5 (Dec 8 - 14)
 
 `Norah E. Milanesi`: https://github.com/doda2025-team20/operation/pull/18\
 This week, I focused on implementing Istio traffic management. I worked on configuring the Gateway and VirtualServices to route traffic to both v1 and v2 versions of the app-service and model-service, ensuring proper version-specific routing. I also set up DestinationRules and weights for canary deployments and verified sticky sessions for consistent request routing. Additionally, I troubleshot Minikube networking issues, tested service connectivity through the ingress, and documented the setup and troubleshooting steps for Istio integration.
@@ -172,10 +172,14 @@ https://github.com/doda2025-team20/operation/pull/36
 https://github.com/doda2025-team20/operation/pull/32
 
 
-### Week Q2.9 (Jan 19+)
+
+### Week Q2.9 (Jan 19 - 25)
 
 `Norah E. Milanesi`: https://github.com/doda2025-team20/model-service/pull/13\
 This week I improved the SMS spam detection system's observability and metrics accuracy by adding confidence score calculation to the model service to return actual prediction probabilities instead of placeholder values. I also updated the frontend to integrate these dynamic confidence scores and added version labels to all Prometheus metrics for better tracking across deployments.
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/39\
-This week I worked on documentation mainly for assignment 4. I looked at our docs/deployment.md file and fixed some inconsistencies regarding the shadow launch deployment. I also described our usage of sticky sessions for consistent user experience, as well as the option to manually set a canary cookie as a developer in order to use another deployment of the application. In our main README.md, I included information about our extension - GitOps with Flux. Finally, I explained our deployments, service mesh, and traffic management using Istio, including implementation and architecture. 
+This week I worked on documentation mainly for assignment 4. I looked at our docs/deployment.md file and fixed some inconsistencies regarding the shadow launch deployment. I also described our usage of sticky sessions for consistent user experience, as well as the option to manually set a canary cookie as a developer in order to use another deployment of the application. In our main README.md, I included information about our extension - GitOps with Flux. Finally, I explained our deployments, service mesh, and traffic management using Istio, including implementation and architecture.
+
+`Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/40\
+This week I reworked the Prometheus stack installation, which before was happening manually and on a separate namespace, in a non-standardized way. `kube-prometheus-stack` has now been included as a dependency in our Helm Chart, and the `README.md` has been updated with the new installation and usage instructions. Prometheus and AlertManager configurations have been updated to be properly targeted by the operator, and Grafana has been properly reconfigured to use the one deployed by the stack, instead of deploying our own version manually. Grafana is now accessible through either Ingress or Istio VirtualService at `/grafana`.
