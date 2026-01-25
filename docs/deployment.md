@@ -134,12 +134,13 @@ This strategy introduces limited user exposure to the new version and is suitabl
 
 To manage user experience across versions, two distinct cookie-based mechanisms are employed:
 
-#### 1. Automatic Sticky Sessions (Consistency)
-To ensure that a user remains on the same version during their session, Istio is configured to use **consistent hashing** based on a specific cookie.
+#### 1. Automatic Sticky Sessions
+To ensure that a user maintains a stable connection to a specific **pod** (replica) within a version, Istio is configured to use consistent hashing.
 
 - **Cookie Name:** `user-session` (configured in `values.yaml`)
 - **Mechanism:** The **DestinationRule** defines a consistent hash load balancer.
-- **Behavior:** Istio (Envoy) generates this cookie for clients that don't have it and routes all subsequent requests with the same cookie value to the same backend instance. This prevents users from "flip-flopping" between `v1` and `v2`.
+- **Behavior:** This ensures that once a request reaches a specific version service (e.g., `v1`), subsequent requests with the same cookie are routed to the **same backend replica**.
+    - **Note:** This does **not** guarantee version stickiness. The `VirtualService` weighted routing (90/10) occurs *before* this load balancing, so a user might still switch between versions across requests unless manual pinning is used.
 
 #### 2. Manual Version Pinning (Testing)
 For testing purposes, developers can force routing to a specific version, bypassing the random split and sticky sessions.
