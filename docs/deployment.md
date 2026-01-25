@@ -31,6 +31,7 @@ Each version of the frontend is deployed as a separate Kubernetes Deployment and
 - **Versions:**
     - `v1` (stable)
     - `v2` (canary, optional)
+    - `v3` (shadow, optional)
 - **State:** Requires persistent storage for model output
 - **Storage:**
     - PersistentVolumeClaim (PVC) shared across model pods
@@ -129,6 +130,28 @@ The canary deployment strategy is used to gradually expose a new service version
 
 This strategy introduces limited user exposure to the new version and is suitable once basic correctness has been established.
 
+### Sticky Sessions and Manual Overrides
+
+To manage user experience across versions, two distinct cookie-based mechanisms are employed:
+
+#### 1. Automatic Sticky Sessions
+To ensure that a user maintains a stable connection to a specific **pod** (replica) within a version, Istio is configured to use consistent hashing.
+
+- **Cookie Name:** `user-session` (configured in `values.yaml`)
+- **Mechanism:** The **DestinationRule** defines a consistent hash load balancer.
+- **Behavior:** This ensures that once a request reaches a specific version service (e.g., `v1`), subsequent requests with the same cookie are routed to the **same backend replica**.
+    - **Note:** This does **not** guarantee version stickiness. The `VirtualService` weighted routing (90/10) occurs *before* this load balancing, so a user might still switch between versions across requests unless manual pinning is used.
+
+#### 2. Manual Version Pinning (Testing)
+For testing purposes, developers can force routing to a specific version, bypassing the random split and sticky sessions.
+
+- **Cookie Name:** `canary`
+- **Mechanism:** The **VirtualService** uses regex matching on the cookie header.
+- **Behavior:**
+    - `canary=v1` -> Forces routing to **v1** (stable).
+    - `canary=v2` -> Forces routing to **v2** (canary).
+- **Usage:** Manually set via browser DevTools or `curl` (e.g., `curl --cookie "canary=v2" ...`) to test a specific version.
+
 ---
 
 ## Shadow Launch (Traffic Mirroring)
@@ -140,7 +163,7 @@ The shadow launch strategy is used to evaluate a new version of the **model serv
 ### Behavior
 
 - 100% of user traffic is routed to the stable version (`v1`)
-- Requests are **duplicated** and mirrored to the shadow version (`v2`)
+- Requests are **duplicated** and mirrored to the shadow version (`v3`)
 - Responses from the shadow version are discarded
 - Failures or increased latency in the shadow version do not impact users
 

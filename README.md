@@ -17,6 +17,7 @@ The organization consists of the following repositories:
 | **model-service** | Backend ML inference service               | [https://github.com/doda2025-team20/model-service/tree/a4](https://github.com/doda2025-team20/model-service/tree/a4) |
 | **app**           | Frontend application and API gateway       | [https://github.com/doda2025-team20/app/tree/a4](https://github.com/doda2025-team20/app/tree/a4)                     |
 | **lib-version**   | Version-aware shared library               | [https://github.com/doda2025-team20/lib-version/tree/a4](https://github.com/doda2025-team20/lib-version/tree/a4)     |
+| **team20-flux**   | GitOps configuration (Extension)           | [https://github.com/doda2025-team20/team20-flux](https://github.com/doda2025-team20/team20-flux)                     |
 
 Each component is built, versioned, and deployed independently.
 
@@ -192,11 +193,44 @@ Access instructions and dashboard descriptions are available in:
 
 ---
 
+## Service Mesh & Traffic Management
+
+The project uses **Istio** to implement advanced traffic management.
+
+### Architecture
+
+* **Istio Ingress Gateway**: Handles all incoming traffic.
+* **VirtualServices & DestinationRules**: Manage routing between `v1` (stable), `v2` (canary), and `v3` (shadow) versions of the services.
+* **Envoy Sidecars**: Injected into every application pod to intercept and control traffic.
+
+Detailed explanation of the deployment strategies (Canary vs. Shadow Launch) and data flow can be found in:
+
+* **Deployment & Traffic Flow Documentation** -> [`docs/deployment.md`](./docs/deployment.md)
+
+### Implementation Details
+
+The Istio configuration is **fully integrated into the Helm chart**.
+The resources (VirtualServices, Gateways, etc.) are defined in `helm-chart/templates/`.
+
+---
+
 ## Additional Documentation
 
 * **Team activity log**: `ACTIVITY.md`
 
 ---
+
+## Project Extension: GitOps (Assignment A5)
+
+For the optional extension, we implemented a **GitOps-based deployment pipeline using Flux**.
+
+This replaces the manual Helm commands with an automated, declarative workflow where the cluster state is continuously reconciled with a Git repository.
+
+* **Extension Documentation & Proposal** -> [`docs/extension.md`](./docs/extension.md)
+* **Flux Configuration Repository** -> [doda2025-team20/team20-flux](https://github.com/doda2025-team20/team20-flux)
+
+---
+
 
 ## Ongoing Evolution
 
