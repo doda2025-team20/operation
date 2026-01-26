@@ -4,7 +4,7 @@ app:
   port: 8080
   canary:
     enabled: true
-    image: ghcr.io/doda2025-team20/app-sandbox:0.0.5-alpha
+    image: ghcr.io/doda2025-team20/app:canary
     tag: v2
 
 model:
@@ -25,7 +25,7 @@ model:
   mountPath: /sms/output
   canary:
     enabled: false
-    image: ghcr.io/doda2025-team20/model-service:latest
+    image: ghcr.io/doda2025-team20/model-service:canary
     tag: v2
 
   shadow:
