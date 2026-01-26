@@ -13,11 +13,11 @@ The organization consists of the following repositories:
 
 | Component         | Description                                | Repository                                                                                           |
 | ----------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
-| **operation**     | Infrastructure, deployment, and operations | [https://github.com/doda2025-team20/operation/tree/a4](https://github.com/doda2025-team20/operation/tree/a4)         |
-| **model-service** | Backend ML inference service               | [https://github.com/doda2025-team20/model-service/tree/a4](https://github.com/doda2025-team20/model-service/tree/a4) |
-| **app**           | Frontend application and API gateway       | [https://github.com/doda2025-team20/app/tree/a4](https://github.com/doda2025-team20/app/tree/a4)                     |
-| **lib-version**   | Version-aware shared library               | [https://github.com/doda2025-team20/lib-version/tree/a4](https://github.com/doda2025-team20/lib-version/tree/a4)     |
-| **team20-flux**   | GitOps configuration (Extension)           | [https://github.com/doda2025-team20/team20-flux](https://github.com/doda2025-team20/team20-flux)                     |
+| **operation**     | Infrastructure, deployment, and operations | [https://github.com/doda2025-team20/operation](https://github.com/doda2025-team20/operation)         |
+| **model-service** | Backend ML inference service               | [https://github.com/doda2025-team20/model-service](https://github.com/doda2025-team20/model-service) |
+| **app**           | Frontend application and API gateway       | [https://github.com/doda2025-team20/app](https://github.com/doda2025-team20/app)                     |
+| **lib-version**   | Version-aware shared library               | [https://github.com/doda2025-team20/lib-version](https://github.com/doda2025-team20/lib-version)     |
+| **team20-flux**   | GitOps configuration (Extension)           | [https://github.com/doda2025-team20/team20-flux](https://github.com/doda2025-team20/team20-flux)     |
 
 Each component is built, versioned, and deployed independently.
 
@@ -61,16 +61,16 @@ docker compose up -d
 
 The deployment is configurable via the `.env` file:
 
-| Variable        | Default                                        | Description          |
-| --------------- | ---------------------------------------------- | -------------------- |
-| `APP_IMAGE`     | `ghcr.io/doda2025-team20/app:latest`           | Frontend image       |
-| `MODEL_IMAGE`   | `ghcr.io/doda2025-team20/model-service:latest` | Backend image        |
-| `APP_PORT`      | `8080`                                         | App container port   |
-| `MODEL_PORT`    | `8081`                                         | Model container port |
-| `HOST_APP_PORT` | `8080`                                         | Host port            |
-| `MODEL_HOST`    | `http://model-service:8081`                    | App -> model routing  |
-| `MODEL_URL`     | latest release                                 | Model download URL   |
-| `DEBUG`         | `false`                                        | Flask debug mode     |
+| Variable        | Default                                        | Description            |
+| --------------- | ---------------------------------------------- | ---------------------- |
+| `APP_IMAGE`     | `ghcr.io/doda2025-team20/app:latest`           | Frontend image         |
+| `MODEL_IMAGE`   | `ghcr.io/doda2025-team20/model-service:latest` | Backend image          |
+| `APP_PORT`      | `8080`                                         | App container port     |
+| `MODEL_PORT`    | `8081`                                         | Model container port   |
+| `HOST_APP_PORT` | `8080`                                         | Host port              |
+| `MODEL_HOST`    | `http://model-service:8081`                    | App -> model routing   |
+| `MODEL_VERSION` | `latest`                                       | Model download version |
+| `DEBUG`         | `false`                                        | Flask debug mode       |
 
 ### Volumes
 
