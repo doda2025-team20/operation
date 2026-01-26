@@ -70,10 +70,11 @@ data:
                 "uid": "prometheus"
               },
               "expr": "sms_last_confidence{result=\"spam\"}",
+              "legendFormat": "{{ "{{version}}" }}",
               "refId": "A"
             }
           ],
-          "title": "Last Spam Confidence (Gauge)",
+          "title": "Last Spam Confidence",
           "type": "gauge"
         },
         {
@@ -156,7 +157,7 @@ data:
                 "uid": "prometheus"
               },
               "expr": "rate(sms_requests_total{result=\"spam\"}[$__rate_interval])",
-              "legendFormat": "{{ "Spam Requests" }}",
+              "legendFormat": "{{ "Spam Requests {{version}}" }}",
               "refId": "A"
             },
             {
@@ -165,11 +166,11 @@ data:
                 "uid": "prometheus"
               },
               "expr": "rate(sms_requests_total{result=\"ham\"}[$__rate_interval])",
-              "legendFormat": "{{ "Ham Requests" }}",
+              "legendFormat": "{{ "Ham Requests {{version}}" }}",
               "refId": "B"
             }
           ],
-          "title": "SMS Request Rate (Counter with rate())",
+          "title": "SMS Request Rate",
           "type": "timeseries"
         },
         {
@@ -274,7 +275,7 @@ data:
               "refId": "C"
             }
           ],
-          "title": "Request Duration Histogram (p50, p95, avg)",
+          "title": "Request Duration Histogram",
           "type": "timeseries"
         },
         {
@@ -327,7 +328,7 @@ data:
                 "uid": "prometheus"
               },
               "expr": "sms_requests_total{result=\"spam\"}",
-              "legendFormat": "{{ "Spam" }}",
+              "legendFormat": "{{ "Spam {{version}}" }}",
               "refId": "A"
             },
             {
@@ -336,11 +337,11 @@ data:
                 "uid": "prometheus"
               },
               "expr": "sms_requests_total{result=\"ham\"}",
-              "legendFormat": "{{ "Ham" }}",
+              "legendFormat": "{{ "Ham {{version}}" }}",
               "refId": "B"
             }
           ],
-          "title": "Total SMS Classifications (Bar Chart)",
+          "title": "Total SMS Classifications",
           "type": "bargauge"
         },
         {
@@ -401,10 +402,11 @@ data:
                 "uid": "prometheus"
               },
               "expr": "sms_last_confidence{result=\"ham\"}",
+              "legendFormat": "{{ "{{version}}" }}",
               "refId": "A"
             }
           ],
-          "title": "Last Ham Confidence (Gauge)",
+          "title": "Last Ham Confidence",
           "type": "gauge"
         },
         {
@@ -454,7 +456,7 @@ data:
                 "uid": "prometheus"
               },
               "expr": "sms_requests_total",
-              "legendFormat": "{{ "{{result}}" }}",
+              "legendFormat": "{{ "{{result}} {{version}}" }}",
               "refId": "A"
             }
           ],
