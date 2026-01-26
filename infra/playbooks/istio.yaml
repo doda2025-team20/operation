@@ -1,0 +1,83 @@
+---
+- hosts: ctrl
+  become: true
+  vars:
+    istio_version: "1.24.2"
+    istio_profile: "demo"
+    kubeconfig_path: /home/vagrant/.kube/config
+    istioctl_path: /usr/local/bin/istioctl
+    istio_tmp_dir: "/tmp/istio-{{ istio_version }}"
+    istio_tgz: "/tmp/istio-{{ istio_version }}.tar.gz"
+
+  tasks:
+    - name: Detect VM architecture
+      ansible.builtin.command: uname -m
+      register: arch_out
+      changed_when: false
+
+    - name: Set Istio download arch (arm64 vs amd64)
+      ansible.builtin.set_fact:
+        istio_arch: "{{ 'arm64' if arch_out.stdout in ['aarch64', 'arm64'] else 'amd64' }}"
+
+    - name: Check if istio-system namespace exists
+      ansible.builtin.command: kubectl get ns istio-system --kubeconfig {{ kubeconfig_path }}
+      register: istio_ns
+      failed_when: false
+      changed_when: false
+
+    - name: Remove any existing istioctl + old temp files (clean slate)
+      ansible.builtin.shell: |
+        rm -f {{ istioctl_path }}
+        rm -rf /tmp/istio-*
+        rm -f /tmp/istio-*.tar.gz
+      args:
+        executable: /bin/bash
+      when: istio_ns.rc != 0
+
+    - name: Download Istio archive (correct arch)
+      ansible.builtin.get_url:
+        url: "https://github.com/istio/istio/releases/download/{{ istio_version }}/istio-{{ istio_version }}-linux-{{ istio_arch }}.tar.gz"
+        dest: "{{ istio_tgz }}"
+        mode: "0644"
+      when: istio_ns.rc != 0
+
+    - name: Extract Istio
+      ansible.builtin.unarchive:
+        src: "{{ istio_tgz }}"
+        dest: /tmp
+        remote_src: true
+      when: istio_ns.rc != 0
+
+    - name: Install istioctl
+      ansible.builtin.copy:
+        src: "{{ istio_tmp_dir }}/bin/istioctl"
+        dest: "{{ istioctl_path }}"
+        mode: "0755"
+        remote_src: true
+      when: istio_ns.rc != 0
+
+    - name: Verify istioctl binary matches VM architecture
+      ansible.builtin.command: file {{ istioctl_path }}
+      register: istioctl_file
+      changed_when: false
+
+    - name: Fail if istioctl arch is wrong
+      ansible.builtin.fail:
+        msg: "istioctl has wrong architecture: {{ istioctl_file.stdout }} (VM arch={{ arch_out.stdout }})"
+      when: >
+        (arch_out.stdout in ['aarch64','arm64'] and 'aarch64' not in istioctl_file.stdout and 'ARM aarch64' not in istioctl_file.stdout) or
+        (arch_out.stdout not in ['aarch64','arm64'] and 'x86-64' not in istioctl_file.stdout)
+
+    - name: Install Istio into cluster (CRDs + control plane)
+      ansible.builtin.command: "{{ istioctl_path }} install --set profile={{ istio_profile }} -y"
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      when: istio_ns.rc != 0
+
+    - name: Wait for istiod
+      ansible.builtin.command: kubectl -n istio-system rollout status deploy/istiod --timeout=300s --kubeconfig {{ kubeconfig_path }}
+      changed_when: false
+
+    - name: Wait for ingress gateway
+      ansible.builtin.command: kubectl -n istio-system rollout status deploy/istio-ingressgateway --timeout=300s --kubeconfig {{ kubeconfig_path }}
+      changed_when: false
