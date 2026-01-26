@@ -1,21 +1,16 @@
-# WORK IN PROGRESS
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "helm-chart.fullname" . }}-grafana-dashboards
   labels:
     {{- include "helm-chart.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
 data:
   app-metrics-dashboard.json: |
     {
-      "annotations": {
-        "list": []
-      },
+      "annotations": { "list": [] },
       "editable": true,
-      "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": null,
-      "links": [],
       "panels": [
         {
           "datasource": {
@@ -37,15 +32,17 @@ data:
                   },
                   {
                     "color": "yellow",
-                    "value": 50
+                    "value": 0.5
                   },
                   {
                     "color": "red",
-                    "value": 100
+                    "value": 0.8
                   }
                 ]
               },
-              "unit": "short"
+              "unit": "percentunit",
+              "max": 1,
+              "min": 0
             }
           },
           "gridPos": {
@@ -72,11 +69,12 @@ data:
                 "type": "prometheus",
                 "uid": "prometheus"
               },
-              "expr": "active_users",
+              "expr": "sms_last_confidence{result=\"spam\"}",
+              "legendFormat": "{{ "{{version}}" }}",
               "refId": "A"
             }
           ],
-          "title": "Active Users (Gauge)",
+          "title": "Last Spam Confidence",
           "type": "gauge"
         },
         {
@@ -104,7 +102,7 @@ data:
                   "legend": false
                 },
                 "lineInterpolation": "linear",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "pointSize": 5,
                 "scaleDistribution": {
                   "type": "linear"
@@ -158,12 +156,21 @@ data:
                 "type": "prometheus",
                 "uid": "prometheus"
               },
-              "expr": "rate(http_requests_total{job=\"myapp-frontend\"}[$__rate_interval])",
-              "legendFormat": "{{ "{{method}} {{endpoint}}" }}",
+              "expr": "rate(sms_requests_total{result=\"spam\"}[$__rate_interval])",
+              "legendFormat": "{{ "Spam Requests {{version}}" }}",
               "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "rate(sms_requests_total{result=\"ham\"}[$__rate_interval])",
+              "legendFormat": "{{ "Ham Requests {{version}}" }}",
+              "refId": "B"
             }
           ],
-          "title": "Request Rate by Endpoint (Counter with rate())",
+          "title": "SMS Request Rate",
           "type": "timeseries"
         },
         {
@@ -182,8 +189,8 @@ data:
                 "axisLabel": "",
                 "axisPlacement": "auto",
                 "barAlignment": 0,
-                "drawStyle": "bars",
-                "fillOpacity": 100,
+                "drawStyle": "line",
+                "fillOpacity": 10,
                 "gradientMode": "none",
                 "hideFrom": {
                   "tooltip": false,
@@ -191,12 +198,12 @@ data:
                   "legend": false
                 },
                 "lineInterpolation": "linear",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "pointSize": 5,
                 "scaleDistribution": {
                   "type": "linear"
                 },
-                "showPoints": "never",
+                "showPoints": "auto",
                 "spanNulls": false,
                 "stacking": {
                   "group": "A",
@@ -228,7 +235,7 @@ data:
           "id": 3,
           "options": {
             "legend": {
-              "calcs": ["mean", "max"],
+              "calcs": ["mean", "max", "lastNotNull"],
               "displayMode": "table",
               "placement": "bottom",
               "showLegend": true
@@ -245,8 +252,8 @@ data:
                 "type": "prometheus",
                 "uid": "prometheus"
               },
-              "expr": "histogram_quantile(0.95, rate(request_duration_seconds_bucket{job=\"myapp-frontend\"}[$__rate_interval]))",
-              "legendFormat": "{{ "p95 {{endpoint}}" }}",
+              "expr": "histogram_quantile(0.95, rate(sms_request_duration_seconds_bucket[$__rate_interval]))",
+              "legendFormat": "{{ "p95" }}",
               "refId": "A"
             },
             {
@@ -254,12 +261,21 @@ data:
                 "type": "prometheus",
                 "uid": "prometheus"
               },
-              "expr": "histogram_quantile(0.50, rate(request_duration_seconds_bucket{job=\"myapp-frontend\"}[$__rate_interval]))",
-              "legendFormat": "{{ "p50 {{endpoint}}" }}",
+              "expr": "histogram_quantile(0.50, rate(sms_request_duration_seconds_bucket[$__rate_interval]))",
+              "legendFormat": "{{ "p50 (median)" }}",
               "refId": "B"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "rate(sms_request_duration_seconds_sum[$__rate_interval]) / rate(sms_request_duration_seconds_count[$__rate_interval])",
+              "legendFormat": "{{ "Average" }}",
+              "refId": "C"
             }
           ],
-          "title": "Request Duration Histogram (p50, p95)",
+          "title": "Request Duration Histogram",
           "type": "timeseries"
         },
         {
@@ -270,7 +286,7 @@ data:
           "fieldConfig": {
             "defaults": {
               "color": {
-                "mode": "thresholds"
+                "mode": "palette-classic"
               },
               "mappings": [],
               "thresholds": {
@@ -286,7 +302,7 @@ data:
             }
           },
           "gridPos": {
-            "h": 6,
+            "h": 8,
             "w": 12,
             "x": 0,
             "y": 8
@@ -311,17 +327,146 @@ data:
                 "type": "prometheus",
                 "uid": "prometheus"
               },
-              "expr": "sum by(endpoint) (http_requests_total)",
+              "expr": "sms_requests_total{result=\"spam\"}",
+              "legendFormat": "{{ "Spam {{version}}" }}",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sms_requests_total{result=\"ham\"}",
+              "legendFormat": "{{ "Ham {{version}}" }}",
+              "refId": "B"
+            }
+          ],
+          "title": "Total SMS Classifications",
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 0.5
+                  },
+                  {
+                    "color": "red",
+                    "value": 0.8
+                  }
+                ]
+              },
+              "unit": "percentunit",
+              "max": 1,
+              "min": 0
+            }
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 12,
+            "y": 8
+          },
+          "id": 5,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "values": false,
+              "calcs": ["lastNotNull"],
+              "fields": ""
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "10.0.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sms_last_confidence{result=\"ham\"}",
+              "legendFormat": "{{ "{{version}}" }}",
               "refId": "A"
             }
           ],
-          "title": "Total Requests by Endpoint (Bar Chart)",
-          "type": "bargauge"
+          "title": "Last Ham Confidence",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "tooltip": false,
+                  "viz": false,
+                  "legend": false
+                }
+              },
+              "mappings": []
+            }
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 8
+          },
+          "id": 6,
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "pieType": "pie",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "10.0.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sms_requests_total",
+              "legendFormat": "{{ "{{result}} {{version}}" }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Spam vs Ham Distribution",
+          "type": "piechart"
         }
       ],
-      "refresh": "5s",
+      "refresh": "10s",
       "schemaVersion": 38,
-      "tags": ["app-metrics"],
+      "tags": ["app-metrics", "sms"],
       "templating": {
         "list": [
           {
@@ -369,21 +514,17 @@ data:
       },
       "timepicker": {},
       "timezone": "browser",
-      "title": "App Metrics Dashboard",
-      "uid": "app-metrics",
+      "title": "SMS App Metrics Dashboard",
+      "uid": "sms-app-metrics",
       "version": 1,
       "weekStart": ""
     }
+
   experimental-dashboard.json: |
     {
-      "annotations": {
-        "list": []
-      },
+      "annotations": { "list": [] },
       "editable": true,
-      "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": null,
-      "links": [],
       "panels": [
         {
           "datasource": {
@@ -435,7 +576,7 @@ data:
                   }
                 ]
               },
-              "unit": "short"
+              "unit": "reqps"
             }
           },
           "gridPos": {
@@ -464,8 +605,8 @@ data:
                 "type": "prometheus",
                 "uid": "prometheus"
               },
-              "expr": "rate(experimental_feature_usage_total{version=\"stable\"}[$__rate_interval])",
-              "legendFormat": "Stable Version",
+              "expr": "rate(sms_requests_total{version=\"v1\"}[$__rate_interval])",
+              "legendFormat": "{{ "Stable (v1)" }}",
               "refId": "A"
             },
             {
@@ -473,12 +614,108 @@ data:
                 "type": "prometheus",
                 "uid": "prometheus"
               },
-              "expr": "rate(experimental_feature_usage_total{version=\"canary\"}[$__rate_interval])",
-              "legendFormat": "Canary Version",
+              "expr": "rate(sms_requests_total{version=\"v2\"}[$__rate_interval])",
+              "legendFormat": "{{ "Canary (v2)" }}",
               "refId": "B"
             }
           ],
-          "title": "Feature Usage: Stable vs Canary",
+          "title": "Request Rate: Stable vs Canary",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "tooltip": false,
+                  "viz": false,
+                  "legend": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 2,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "s"
+            }
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 12,
+            "y": 0
+          },
+          "id": 2,
+          "options": {
+            "legend": {
+              "calcs": ["mean", "max"],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "10.0.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "histogram_quantile(0.95, rate(sms_request_duration_seconds_bucket{version=\"v1\"}[$__rate_interval]))",
+              "legendFormat": "{{ "v1 p95" }}",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "histogram_quantile(0.95, rate(sms_request_duration_seconds_bucket{version=\"v2\"}[$__rate_interval]))",
+              "legendFormat": "{{ "v2 p95" }}",
+              "refId": "B"
+            }
+          ],
+          "title": "Latency Comparison (p95)",
           "type": "timeseries"
         },
         {
@@ -493,28 +730,32 @@ data:
               },
               "mappings": [],
               "thresholds": {
-                "mode": "absolute",
+                "mode": "percentage",
                 "steps": [
                   {
                     "color": "green",
                     "value": null
                   },
                   {
+                    "color": "yellow",
+                    "value": 50
+                  },
+                  {
                     "color": "red",
-                    "value": 0.95
+                    "value": 80
                   }
                 ]
               },
-              "unit": "percentunit"
+              "unit": "short"
             }
           },
           "gridPos": {
-            "h": 9,
-            "w": 12,
-            "x": 12,
-            "y": 0
+            "h": 6,
+            "w": 6,
+            "x": 0,
+            "y": 9
           },
-          "id": 2,
+          "id": 3,
           "options": {
             "orientation": "auto",
             "reduceOptions": {
@@ -532,18 +773,278 @@ data:
                 "type": "prometheus",
                 "uid": "prometheus"
               },
-              "expr": "avg(rate(http_requests_total{version=\"canary\", status=~\"5..\"}[$__rate_interval])) / avg(rate(http_requests_total{version=\"canary\"}[$__rate_interval]))",
-              "legendFormat": "Canary Error Rate",
+              "expr": "sum(sms_requests_total{version=\"v1\"})",
               "refId": "A"
             }
           ],
-          "title": "Canary Error Rate",
+          "title": "Total v1 Requests",
           "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 50
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            }
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 6,
+            "x": 6,
+            "y": 9
+          },
+          "id": 4,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "values": false,
+              "calcs": ["lastNotNull"],
+              "fields": ""
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "10.0.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sum(sms_requests_total{version=\"v2\"})",
+              "refId": "A"
+            }
+          ],
+          "title": "Total v2 Requests",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "tooltip": false,
+                  "viz": false,
+                  "legend": false
+                }
+              },
+              "mappings": []
+            }
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 12,
+            "y": 9
+          },
+          "id": 5,
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "values": ["value", "percent"]
+            },
+            "pieType": "donut",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "10.0.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sum by(version) (sms_requests_total)",
+              "legendFormat": "{{ "{{version}}" }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Traffic Distribution",
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "tooltip": false,
+                  "viz": false,
+                  "legend": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 2,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "reqps"
+            }
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 0,
+            "y": 15
+          },
+          "id": 6,
+          "options": {
+            "legend": {
+              "calcs": ["mean", "lastNotNull", "max"],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "10.0.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "rate(sms_request_mode_total{mode=\"normal\"}[$__rate_interval])",
+              "legendFormat": "{{ "Normal mode (req/s)" }}",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "rate(sms_request_mode_total{mode=\"bulk\"}[$__rate_interval])",
+              "legendFormat": "{{ "Bulk mode (req/s)" }}",
+              "refId": "B"
+            }
+          ],
+          "title": "Request Rate by Mode",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "mappings": []
+            }
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 12,
+            "y": 15
+          },
+          "id": 7,
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "values": ["value", "percent"]
+            },
+            "pieType": "donut",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "10.0.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sum by(mode) (sms_request_mode_total)",
+              "legendFormat": "{{ "{{mode}}" }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Mode Preference (Total Requests)",
+          "type": "piechart"
         }
       ],
-      "refresh": "10s",
+      "refresh": "30s",
       "schemaVersion": 38,
-      "tags": ["experimental"],
+      "tags": ["experimental", "canary"],
       "templating": {
         "list": []
       },
@@ -553,8 +1054,8 @@ data:
       },
       "timepicker": {},
       "timezone": "browser",
-      "title": "Experimental A/B Testing Dashboard",
-      "uid": "experimental",
+      "title": "SMS Experimental A/B Testing Dashboard",
+      "uid": "sms-experimental",
       "version": 1,
       "weekStart": ""
     }
