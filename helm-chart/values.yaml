@@ -24,7 +24,7 @@ model:
 
   mountPath: /sms/output
   canary:
-    enabled: false
+    enabled: true
     image: ghcr.io/doda2025-team20/model-service:canary
     tag: v2
 
