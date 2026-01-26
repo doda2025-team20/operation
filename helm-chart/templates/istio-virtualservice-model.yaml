@@ -1,0 +1,55 @@
+{{- if .Values.istio.enabled }}
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: {{ .Values.model.name }}-vs
+  labels:
+    {{- include "helm-chart.labels" . | nindent 4 }}
+spec:
+  hosts:
+    - {{ .Values.model.name }}
+  http:
+  {{- if .Values.model.shadow.enabled }}
+
+    # -----------------------
+    # Shadow launch
+    # -----------------------
+    - route:
+        - destination:
+            host: {{ .Values.model.name }}
+            subset: v1
+          weight: 100
+      mirror:
+        host: {{ .Values.model.name }}
+        subset: {{ .Values.model.shadow.tag }}
+      mirrorPercentage:
+        value: {{ .Values.istio.shadow.mirrorPercentage | default 100 }}
+
+  {{- else if .Values.model.canary.enabled }}
+
+    # -----------------------
+    # Canary deployment
+    # -----------------------
+    - route:
+        - destination:
+            host: {{ .Values.model.name }}
+            subset: v1
+          weight: {{ .Values.istio.canary.stableWeight }}
+        - destination:
+            host: {{ .Values.model.name }}
+            subset: v2
+          weight: {{ .Values.istio.canary.canaryWeight }}
+
+  {{- else }}
+
+    # -----------------------
+    # Default: stable only
+    # -----------------------
+    - route:
+        - destination:
+            host: {{ .Values.model.name }}
+            subset: v1
+          weight: 100
+
+  {{- end }}
+{{- end }}

@@ -1,25 +1,23 @@
 services:
   app-service:
-    image: ghcr.io/doda2025-team20/app:latest
+    image: ${APP_IMAGE}
     container_name: app-service
     ports:
-      - "8080:8080"
+      - "${HOST_APP_PORT}:${APP_PORT}"
     environment:
-      - MODEL_HOST=http://model-service:8081
-      # - APP_PORT=8080
-    restart:
-      unless-stopped
+      MODEL_HOST: ${MODEL_HOST}
+      APP_PORT: ${APP_PORT}
+    restart: unless-stopped
+    depends_on:
+      - model-service
 
   model-service:
-    image: ghcr.io/doda2025-team20/model-service:latest
+    image: ${MODEL_IMAGE}
     container_name: model-service
-    # ports:
-    #   - "8081:8081" # Expose if needed for local testing
-    # environment:
-      # - MODEL_PORT=8081
-      # - MODEL_URL="" # Source URL for model download
-      # - DEBUG=false
+    environment:
+      MODEL_PORT: ${MODEL_PORT}
+      MODEL_URL: ${MODEL_URL}
+      DEBUG: ${DEBUG}
     volumes:
       - ./output:/sms/output
-    restart:
-      unless-stopped
+    restart: unless-stopped

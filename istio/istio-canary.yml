@@ -1,0 +1,197 @@
+# istio-canary.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lib-v1
+  labels:
+    app: lib
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lib
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: lib
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8080"
+    spec:
+      containers:
+      - name: lib
+        image: proksch/istio-example-lib:0.0.1
+        ports:
+        - containerPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lib-v2
+  labels:
+    app: lib
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lib
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: lib
+        version: v2
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8080"
+    spec:
+      containers:
+      - name: lib
+        image: proksch/istio-example-lib:0.0.2
+        ports:
+        - containerPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-v1
+  labels:
+    app: app
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: app
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8080"
+    spec:
+      containers:
+      - name: app
+        image: proksch/istio-example-app:0.0.1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: LIB_URL
+          value: http://lib:1234/
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-v2
+  labels:
+    app: app
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: app
+        version: v2
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8080"
+    spec:
+      containers:
+      - name: app
+        image: proksch/istio-example-app:0.0.2
+        ports:
+        - containerPort: 8080
+        env:
+        - name: LIB_URL
+          value: http://lib:1234/
+---
+apiVersion: v1
+kind: Service
+metadata: { name: lib }
+spec:
+  selector: { app: lib }
+  ports:
+  - { name: http, port: 1234, targetPort: 8080 }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: app }
+spec:
+  selector: { app: app }
+  ports:
+  - { name: http, port: 1234, targetPort: 8080 }
+---
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata: { name: my-gateway }
+spec:
+  selector: { istio: ingressgateway }
+  servers:
+  - port: { number: 80, name: http, protocol: HTTP }
+    hosts: [ "*" ]
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata: { name: my-entry-service }
+spec:
+  gateways: [ my-gateway ]
+  hosts: [ "*" ]
+  http:
+  - match:
+    - uri: { prefix: / }
+    route:
+    - destination: { host: app, subset: v1 }
+      weight: 90
+    - destination: { host: app, subset: v2 }
+      weight: 10
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata: { name: lib-dr }
+spec:
+  host: lib
+  subsets:
+  - name: v1
+    labels: { version: v1 }
+  - name: v2
+    labels: { version: v2 }
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata: { name: app-dr }
+spec:
+  host: app
+  subsets:
+  - name: v1
+    labels: { version: v1 }
+  - name: v2
+    labels: { version: v2 }
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata: { name: lib-vs }
+spec:
+  hosts: [ lib ]
+  http:
+  - match:
+    - sourceLabels: { version: v2 }
+    route:
+    - destination: { host: lib, subset: v2 }
+  - route: # default route
+    - destination: { host: lib, subset: v1 }

@@ -1,34 +1,135 @@
+# V1 Deployment (Stable)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.model.name }}
+  name: {{ .Values.model.name }}-v1
   labels:
+    {{- include "helm-chart.labels" . | nindent 4 }}
     app: {{ .Values.model.name }}
+    version: v1
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: {{ .Values.model.name }}
+      version: v1
   template:
     metadata:
       labels:
         app: {{ .Values.model.name }}
+        version: v1
+      # REMOVED prometheus.io annotations - using ServiceMonitor instead
     spec:
       containers:
-        - name: {{ .Values.model.name }}
-          image: {{ .Values.model.image }}
-          ports:
-            - containerPort: {{ .Values.model.port }}
-          volumeMounts:
-            - name: model-output
-              mountPath: {{ .Values.model.mountPath }}
-      volumes:
+      - name: {{ .Values.model.name }}
+        image: {{ .Values.model.image }}
+        ports:
+        - containerPort: {{ .Values.model.port }}
+        env:
+        - name: VERSION
+          value: "v1"
+        volumeMounts:
         - name: model-output
-          {{- if .Values.model.useHostPath }}
-          hostPath:
-            path: {{ .Values.model.hostPath }}
-            type: Directory   # DirectoryOrCreate
-          {{- else }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.model.name }}-pvc
-          {{- end }}
+          mountPath: {{ .Values.model.mountPath }}
+      volumes:
+      - name: model-output
+        {{- if .Values.model.useHostPath }}
+        hostPath:
+          path: {{ .Values.model.hostPath }}
+          type: Directory
+        {{- else }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.model.name }}-pvc
+        {{- end }}
+
+---
+{{- if .Values.istio.canary.enabled }}
+# V2 Deployment (Canary)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.model.name }}-v2
+  labels:
+    {{- include "helm-chart.labels" . | nindent 4 }}
+    app: {{ .Values.model.name }}
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.model.name }}
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.model.name }}
+        version: v2
+    spec:
+      containers:
+      - name: {{ .Values.model.name }}
+        image: {{ .Values.model.canary.image | default .Values.model.image }}
+        ports:
+        - containerPort: {{ .Values.model.port }}
+        env:
+        - name: VERSION
+          value: "v2"
+        volumeMounts:
+        - name: model-output
+          mountPath: {{ .Values.model.mountPath }}
+      volumes:
+      - name: model-output   # ✅ Removed the extra colon
+        {{- if .Values.model.useHostPath }}
+        hostPath:
+          path: {{ .Values.model.hostPath }}
+          type: Directory
+        {{- else }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.model.name }}-pvc
+        {{- end }}
+{{- end }}
+
+---
+{{- if .Values.model.shadow.enabled }}
+# V3 Deployment (Shadow)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.model.name }}-{{ .Values.model.shadow.tag }}
+  labels:
+    {{- include "helm-chart.labels" . | nindent 4 }}
+    app: {{ .Values.model.name }}
+    version: {{ .Values.model.shadow.tag }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.model.name }}
+      version: {{ .Values.model.shadow.tag }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.model.name }}
+        version: {{ .Values.model.shadow.tag }}
+    spec:
+      containers:
+      - name: {{ .Values.model.name }}
+        image: {{ .Values.model.shadow.image | default .Values.model.image }}
+        ports:
+        - containerPort: {{ .Values.model.port }}
+        env:
+        - name: VERSION
+          value: {{ .Values.model.shadow.tag | quote }}
+        volumeMounts:
+        - name: model-output
+          mountPath: {{ .Values.model.mountPath }}
+      volumes:
+      - name: model-output
+        {{- if .Values.model.useHostPath }}
+        hostPath:
+          path: {{ .Values.model.hostPath }}
+          type: Directory
+        {{- else }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.model.name }}-pvc
+        {{- end }}
+{{- end }}

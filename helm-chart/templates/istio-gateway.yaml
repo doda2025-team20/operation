@@ -1,0 +1,20 @@
+{{- if .Values.istio.enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: {{ .Values.istio.gateway.name }}
+  labels:
+    {{- include "helm-chart.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- toYaml .Values.istio.gateway.ingressGatewaySelector | nindent 4 }}
+  servers:
+  - port:
+      number: 8080
+      name: http2
+      protocol: HTTP
+    hosts:
+    {{- range .Values.istio.gateway.hosts }}
+    - {{ . | quote }}
+    {{- end }}
+{{- end }}

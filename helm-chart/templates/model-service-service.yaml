@@ -3,11 +3,14 @@ kind: Service
 metadata:
   name: {{ .Values.model.name }}
   labels:
+    {{- include "helm-chart.labels" . | nindent 4 }}
     app: {{ .Values.model.name }}
 spec:
   type: ClusterIP
   ports:
-    - port: {{ .Values.model.port }}
-      targetPort: {{ .Values.model.port }}
+  - port: {{ .Values.model.port }}
+    targetPort: {{ .Values.model.port }}
+    protocol: TCP
+    name: http
   selector:
     app: {{ .Values.model.name }}
