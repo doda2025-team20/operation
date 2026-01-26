@@ -1,0 +1,56 @@
+{{- if .Values.istio.enabled }}
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ .Values.app.name }}-vs
+  labels:
+    {{- include "helm-chart.labels" . | nindent 4 }}
+spec:
+  gateways:
+  - {{ .Values.istio.gateway.name }}
+  hosts:
+  {{- range .Values.istio.gateway.hosts }}
+  - {{ . | quote }}
+  {{- end }}
+
+  http:
+  # v1 Cookie
+  - match:
+    - headers:
+        cookie:
+          regex: ".*canary=v1.*"
+    route:
+    - destination:
+        host: {{ .Values.app.name }}
+        subset: v1
+
+  # v2 Cookie
+  - match:
+    - headers:
+        cookie:
+          regex: ".*canary=v2.*"
+    route:
+    - destination:
+        host: {{ .Values.app.name }}
+        subset: v2
+
+  # Default routing
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: {{ .Values.app.name }}
+        port:
+          number: {{ .Values.app.port }}
+        subset: v1
+      weight: {{ .Values.istio.canary.stableWeight }}
+    {{- if .Values.istio.canary.enabled }}
+    - destination:
+        host: {{ .Values.app.name }}
+        port:
+          number: {{ .Values.app.port }}
+        subset: v2
+      weight: {{ .Values.istio.canary.canaryWeight }}
+    {{- end }}
+{{- end }}

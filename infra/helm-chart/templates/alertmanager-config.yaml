@@ -1,0 +1,37 @@
+{{- if .Values.alertmanager.enabled }}
+
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: sms-email-config
+  labels:
+    release: monitoring
+spec:
+  route:
+    groupBy: ['alertname']
+    groupWait: 30s
+    groupInterval: 5m
+    repeatInterval: 12h
+    receiver: 'email-receiver'
+    routes:
+      - matchers:
+          - name: namespace
+            value: {{ .Release.Namespace }}
+        receiver: 'email-receiver'
+        groupWait: 10s
+        groupInterval: 1m
+        repeatInterval: 1h
+        continue: false
+
+  receivers:
+  - name: 'email-receiver'
+    emailConfigs:
+      - to: {{ .Values.alertmanager.emailTo }}
+        from: {{ .Values.alertmanager.emailFrom }}
+        smarthost: {{ .Values.alertmanager.smtpHost }}
+        authUsername: {{ .Values.alertmanager.smtpUsername }}
+        authPassword:
+          name: alertmanager-email-secret
+          key: smtp_auth_password
+
+{{- end }}

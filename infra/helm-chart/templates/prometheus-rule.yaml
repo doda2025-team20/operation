@@ -1,0 +1,29 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: sms-traffic-alert
+  labels:
+    {{- include "helm-chart.labels" . | nindent 4 }}
+    release: {{ .Release.Name }}
+spec:
+  groups:
+  - name: sms-app.rules
+    rules:
+    - alert: HighTrafficDetected
+      expr: sum(rate(sms_requests_total[1m])) * 60 > 15
+      for: 2m
+      labels:
+        severity: warning
+        namespace: {{ .Release.Namespace }}
+      annotations:
+        summary: {{ `"High traffic detected on SMS application"` | quote }}
+        description: {{ `"SMS App is receiving {{ $value }} requests per minute (threshold: 15 req/min)."` | quote }}
+  # Uncomment the following block to enable a test alert
+  # - name: test
+  #   rules:
+  #   - alert: EmailTest
+  #     expr: vector(1)
+  #     for: 15s
+  #     labels:
+  #       namespace: {{ .Release.Namespace }}
+  #       severity: critical
