@@ -201,3 +201,26 @@
       register: dns_smoke
       changed_when: false
       failed_when: false
+
+    - name: Install local-path-provisioner (dynamic PV support)
+      ansible.builtin.command: >
+        kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+      environment:
+        KUBECONFIG: /home/vagrant/.kube/config
+      register: local_path_apply
+      changed_when: >
+        'created' in local_path_apply.stdout or
+        'configured' in local_path_apply.stdout
+
+    - name: Mark local-path as default StorageClass
+      ansible.builtin.command: >
+        kubectl patch storageclass local-path
+        -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+      environment:
+        KUBECONFIG: /home/vagrant/.kube/config
+      register: local_path_default
+      changed_when: >
+        'patched' in local_path_default.stdout
+      failed_when: >
+        local_path_default.rc != 0 and
+        'already exists' not in local_path_default.stderr

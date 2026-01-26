@@ -112,7 +112,6 @@ ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inve
 All Kubernetes tooling, access instructions, and operational details are documented here:
 
 * **Cluster services & tooling** -> [`infra/k8s/README.md`](./infra/k8s/README.md)
-
 ---
 
 ## Kubernetes Application Deployment (Helm)
@@ -228,6 +227,16 @@ This replaces the manual Helm commands with an automated, declarative workflow w
 
 * **Extension Documentation & Proposal** -> [`docs/extension.md`](./docs/extension.md)
 * **Flux Configuration Repository** -> [doda2025-team20/team20-flux](https://github.com/doda2025-team20/team20-flux)
+
+### Configuring Flux with Vagrant
+
+To set up Flux in the Vagrant-provisioned cluster, follow these steps:
+1. Go to the flux playbook for vagrant [flux.yaml](./infra/playbooks/flux.yaml)
+2. Update the github token variable with your personal access token that has repo access
+3. Run the playbook with the following command:
+```bash
+ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory playbooks/flux.yaml
+```
 
 ---
 
