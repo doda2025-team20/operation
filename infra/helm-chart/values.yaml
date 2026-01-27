@@ -24,7 +24,7 @@ model:
 
   mountPath: /sms/output
   canary:
-    enabled: false
+    enabled: true
     image: ghcr.io/doda2025-team20/model-service:canary
     tag: v2
 
@@ -32,6 +32,7 @@ model:
     enabled: true
     image: ghcr.io/doda2025-team20/model-service:latest
     tag: v3
+    modelVersion: "model-0.0.3"
 
 kube-prometheus-stack:
   grafana:

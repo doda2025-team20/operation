@@ -2,7 +2,7 @@
 - hosts: ctrl
   become: true
   vars:
-    istio_version: "1.24.2"
+    istio_version: "1.25.2"
     istio_profile: "demo"
     kubeconfig_path: /home/vagrant/.kube/config
     istioctl_path: /usr/local/bin/istioctl
@@ -80,4 +80,8 @@
 
     - name: Wait for ingress gateway
       ansible.builtin.command: kubectl -n istio-system rollout status deploy/istio-ingressgateway --timeout=300s --kubeconfig {{ kubeconfig_path }}
+      changed_when: false
+
+    - name: Label default namespace for Istio automatic sidecar injection
+      ansible.builtin.command: kubectl label namespace default istio-injection=enabled --kubeconfig {{ kubeconfig_path }} --overwrite
       changed_when: false

@@ -9,47 +9,54 @@ spec:
   hosts:
     - {{ .Values.model.name }}
   http:
-  {{- if .Values.model.shadow.enabled }}
+  {{- if .Values.model.canary.enabled }}
 
-    # -----------------------
-    # Shadow launch
-    # -----------------------
-    - route:
+    # v2 to v2 plus shadow if enabled
+    - match:
+      - sourceLabels:
+          version: v2
+      route:
         - destination:
             host: {{ .Values.model.name }}
-            subset: v1
+            subset: {{ .Values.model.canary.tag }}
           weight: 100
+      {{- if .Values.model.shadow.enabled }}
       mirror:
         host: {{ .Values.model.name }}
         subset: {{ .Values.model.shadow.tag }}
       mirrorPercentage:
         value: {{ .Values.istio.shadow.mirrorPercentage | default 100 }}
+      {{- end }}
 
-  {{- else if .Values.model.canary.enabled }}
-
-    # -----------------------
-    # Canary deployment
-    # -----------------------
+    # v1 to v1 plus shadow if enabled
     - route:
-        - destination:
-            host: {{ .Values.model.name }}
-            subset: v1
-          weight: {{ .Values.istio.canary.stableWeight }}
-        - destination:
-            host: {{ .Values.model.name }}
-            subset: v2
-          weight: {{ .Values.istio.canary.canaryWeight }}
+      - destination:
+          host: {{ .Values.model.name }}
+          subset: v1
+        weight: 100
+      {{- if .Values.model.shadow.enabled }}
+      mirror:
+        host: {{ .Values.model.name }}
+        subset: {{ .Values.model.shadow.tag }}
+      mirrorPercentage:
+        value: {{ .Values.istio.shadow.mirrorPercentage | default 100 }}
+      {{- end }}
 
   {{- else }}
 
-    # -----------------------
-    # Default: stable only
-    # -----------------------
+    # Route only to stable v1 and shadow if enabled
     - route:
-        - destination:
-            host: {{ .Values.model.name }}
-            subset: v1
-          weight: 100
+      - destination:
+          host: {{ .Values.model.name }}
+          subset: v1
+        weight: 100
+      {{- if .Values.model.shadow.enabled }}
+      mirror:
+        host: {{ .Values.model.name }}
+        subset: {{ .Values.model.shadow.tag }}
+      mirrorPercentage:
+        value: {{ .Values.istio.shadow.mirrorPercentage | default 100 }}
+      {{- end }}
 
   {{- end }}
 {{- end }}

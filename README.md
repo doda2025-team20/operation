@@ -3,6 +3,8 @@
 This repository (**operation**) serves as the main entry point for the **SMS Checker** project.
 The project is organized as a set of independent components that communicate via REST APIs. Each component is developed in its own repository and released independently. Over the course of the project, the architecture evolved from a minimal prototype into a containerized system with Kubernetes, ingress, service mesh, and monitoring support.
 
+This document serves as the single source of truth for setting up the different components of the system. This document takes precendence over any other documentation found in the individual repositories or subdirectories.
+
 ![Project Architecture](assets/image.png)
 
 ---
@@ -69,39 +71,36 @@ The deployment is configurable via the `.env` file:
 
 ---
 
-### Cluster Provisioning (Vagrant + Ansible)
+### Assignment 2 - Cluster Provisioning
 
-To provision a Kubernetes cluster locally using virtual machines:
+The `infra/` directory contains all infrastructure-as-code required to provision a Kubernetes cluster locally using Vagrant and Ansible. For testing, we have used a VirtualBox provider.
+
+The `Vagrantfile` contains at the top the configuration parameters for the cluster nodes, such as CPU and RAM of controller and worker nodes, the number of the latter being adjustable as well.
+
+To provision the cluster, navigate to the `infra/` directory and run:
 
 ```bash
-cd infra
 vagrant up
+ansible-playbook -i inventory.cfg playbooks/finalization.yaml
 ```
 
-This creates:
+(The `inventory.cfg` file will be created by Vagrant during the `vagrant up` process. If not, the file at `.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory` may be used.)
 
-* one control-plane node
-* two worker nodes
+By default, this creates:
 
-After this is finished, you need to get the proper tools and then run the `finalization.yaml` playbook in order to set up **MetalLB** load balancer and **Ingress**. Before that make sure you have the `community.kubernetes` collection installed:
+* one control-plane node (4 CPUs, 4GB RAM)
+* two worker nodes (2 CPUs, 2GB RAM each)
 
-```bash
-ansible-galaxy collection install community.kubernetes
-```
-If Ansible Galaxy returns an HTTP 500 error, install the collection directly from GitHub instead:
-```bash
-ansible-galaxy collection install "git+https://github.com/ansible-collections/community.kubernetes.git,2.0.0" --force
-```
-After installation is verified, we run `finalization.yaml` to set up MetalLB and Ingress:
+Please adjust the above parameters to your system capabilities as needed.
 
-```bash
-ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory playbooks/finalization.yaml
-```
+Upon succesful provisioning, the `kubeconfig` file will be available at `infra/kubeconfig`, and may be used to access the cluster using `kubectl` from the host machine:
 
-All Kubernetes tooling, access instructions, and operational details are documented here:
+Further documentation can be found in `infra/k8s/README.md`, including instructions for installing and accessing the Kubernetes Dashboard.
 
-* **Cluster services & tooling** -> [`infra/k8s/README.md`](./infra/k8s/README.md)
----
+By default, the cluster uses the following IP addresses for the nodes:
+* Controller: `192.168.56.100`
+* Workers: `192.168.56.100 + N` (where N is 1, 2, ... for each worker)
+* MetalLB IP range: `192.168.56.90 - 192.168.56.99`
 
 ## Kubernetes Application Deployment (Helm)
 
