@@ -13,7 +13,7 @@ The deployment supports **canary deployments** using Istio, allowing multiple ve
 ### Frontend: `app`
 
 - **Type:** Kubernetes Deployment
-- **Role:** User-facing HTTP API
+- **Role:** User-facing HTTP API and User Interface
 - **Function:** Accepts SMS messages and forwards them to the model service for classification
 - **Versions:**
     - `v1` (stable)
@@ -21,7 +21,7 @@ The deployment supports **canary deployments** using Istio, allowing multiple ve
 - **Communication:** Sends HTTP requests to the internal `model-service`
 - **Exposure:** Externally accessible via Istio IngressGateway
 
-Each version of the frontend is deployed as a separate Kubernetes Deployment and distinguished using version labels. Both versions expose the same API and are functionally equivalent from the user’s perspective.
+Each version of the frontend is deployed as a separate Kubernetes Deployment and distinguished using version labels. The canary version offers additional experimental features to a subset of users selected for the experiment.
 
 ### Model Service: `model-service`
 
@@ -37,7 +37,7 @@ Each version of the frontend is deployed as a separate Kubernetes Deployment and
     - PersistentVolumeClaim (PVC) shared across model pods
 - **Exposure:** Internal-only service, not directly accessible by users
 
-The model service is invoked exclusively by the frontend and is abstracted behind a Kubernetes Service and Istio routing rules.
+The model service is invoked exclusively by the frontend and is abstracted behind a Kubernetes Service and Istio routing rules. The canary version supports the additional experimental features of the UI, while the shadow version is used with traffic mirroring to test new versions of the model in the background.
 
 ---
 
@@ -62,6 +62,8 @@ For both the `app` and `model-service`, the following Istio resources are deploy
 - **VirtualService:** Defines request routing and traffic splitting behavior
 - **DestinationRule:** Defines versioned subsets (`v1`, `v2`) based on pod labels
 
+Additionally, an Istio VirtualService has been configured to provide access to Grafana through the `/grafana` endpoint.
+
 ---
 
 ## External Access
@@ -76,22 +78,24 @@ The application is accessed through the Istio IngressGateway:
 
 Users interact only with the frontend service; the model service remains internal to the cluster.
 
+- **Grafana:** Accessible via `/grafana` path on the same IngressGateway.
+
 ---
 
 ## Request Flow
 
 A typical request follows this path:
 
-1. A user sends an HTTP request to the application via `localhost`
-2. The request enters the cluster through the **Istio IngressGateway**
-3. The IngressGateway forwards the request to the **Envoy proxy**
-4. The **VirtualService for the frontend (`app`)** evaluates routing rules
-5. The request is forwarded to either `app v1` or `app v2`, based on the configured traffic weights
-6. The selected frontend instance processes the request
-7. The frontend sends an internal HTTP request to the **model-service**
-8. The **VirtualService for the model-service** selects the appropriate model version
-9. The model performs inference and returns the result
-10. The frontend returns the response to the user via the IngressGateway
+1. A user sends an HTTP request to the application via `localhost`.
+2. The request enters the cluster through the **Istio IngressGateway**.
+3. The IngressGateway forwards the request to the **Envoy proxy**.
+4. The **VirtualService for the frontend (`app`)** evaluates routing rules.
+5. The request is forwarded to either `app v1` or `app v2`, based on the configured traffic weights, or presence of the `canary` cookie, depending on its value, `v1` or `v2` respectively.
+6. The selected frontend instance processes the request.
+7. The frontend sends an internal HTTP request to the **model-service**.
+8. The **VirtualService for the model-service** selects the appropriate model version, consistent with the frontend version (v1 to v1 and v2 to v2, mirroring to shadow v3 in both cases, if enabled).
+9. The model performs inference and returns the result.
+10. The frontend returns the response to the user via the IngressGateway.
 
 All routing decisions are made dynamically by Istio Envoy sidecars and not by application logic.
 
@@ -99,7 +103,7 @@ All routing decisions are made dynamically by Istio Envoy sidecars and not by ap
 
 ## Traffic Management and Experimental Design
 
-The deployment uses **Istio service mesh** to enable advanced traffic management strategies without modifying application code. Two experimental strategies are supported: **canary deployment** and **shadow launch (traffic mirroring)**. These strategies are mutually exclusive and can be enabled via configuration.
+The deployment uses **Istio service mesh** to enable advanced traffic management strategies without modifying application code. Two experimental strategies are supported: **canary deployment** and **shadow launch (traffic mirroring)**. These strategies can be used concurrently and can be enabled via configuration.
 
 ### Traffic Management Overview
 
@@ -121,6 +125,8 @@ The canary deployment strategy is used to gradually expose a new service version
 - User traffic is split between `v1` (stable) and `v2` (canary)
 - Both versions serve user-facing responses
 - Traffic split is percentage-based (e.g. 90% / 10%)
+- Users may be pinned to a specific version using a cookie
+- Requests are routed consistently to the same model-service version as the frontend version
 
 ### Implementation
 
@@ -162,7 +168,7 @@ The shadow launch strategy is used to evaluate a new version of the **model serv
 
 ### Behavior
 
-- 100% of user traffic is routed to the stable version (`v1`)
+- 100% of user traffic is routed to the stable version (`v1`), or weighted with canary if enabled
 - Requests are **duplicated** and mirrored to the shadow version (`v3`)
 - Responses from the shadow version are discarded
 - Failures or increased latency in the shadow version do not impact users
@@ -182,7 +188,7 @@ The shadow launch allows safe validation of new model versions before promoting 
 
 | Strategy | User-visible responses | Traffic duplication | Risk to users |
 |--------|-----------------------|--------------------|---------------|
-| Canary | Yes (partial) | No | Medium |
+| Canary | Yes | No | Medium |
 | Shadow launch | No | Yes | None |
 | Stable only | Yes | No | None |
 
@@ -194,7 +200,7 @@ The deployment strategy is selected via Helm configuration values:
 
 - Canary deployment is enabled using `istio.canary.enabled`
 - Shadow launch is enabled using `istio.shadow.enabled`
-- Only one strategy can be active at a time
+- Either or both strategies can be activated simultaneously
 
 This design ensures a clean separation of concerns and allows switching deployment strategies without modifying application code.
 
@@ -213,11 +219,13 @@ This design ensures a clean separation of concerns and allows switching deployme
     - Request rate
     - Latency
     - Error rate per version
+- Internal, normally not exposed externally
 
 ### Grafana
 
 - Visualizes Prometheus metrics
 - Used to evaluate the impact of canary deployments and compare versions
+- Exposed at `/grafana` path on the Istio IngressGateway for easy access
 
 ---
 
