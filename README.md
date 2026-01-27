@@ -126,9 +126,9 @@ helm install assignment-release ./helm-chart
 
 Verify that all components are running with `kubectl get pods`.
 
-The `app` Deployment should be available either through an Nginx Ingress or Istio Ingress Gateway, depending on your cluster setup, at `http://localhost` (no special host configuration has been made). The Grafana dashboard should also be available at `http://localhost/grafana` (default credentials: `admin` / `password123`, unles otherwise set in your `values.yaml`).
+The `app` Deployment should be available either through an Nginx Ingress or Istio Ingress Gateway, depending on your cluster setup, at `http://localhost` (no special host configuration has been made). The Grafana dashboard should also be available at `http://localhost/grafana` (default credentials: `admin` / `password123`, unless otherwise set in your `values.yaml`).
 
-The `model-service` and all other components are not publically available through Ingress, and would require port-forwarding. Ensure canary and shadow versions are disabled in all relevant options, when not using Istio, as not doing so may have adverse effects in routing.
+The `model-service` and all other components are not publicly available through Ingress, and would require port-forwarding. Ensure canary and shadow versions are disabled in all relevant options, when not using Istio, as not doing so may have adverse effects in routing.
 
 Further information and commands regarding access in adverse scenarios may be available in the `helm-chart/README.md`, as well as the `docs/` directory.
 

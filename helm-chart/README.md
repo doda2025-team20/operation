@@ -1,27 +1,52 @@
 # Helm Chart – Application, Istio, and Monitoring
 
-This Helm chart deploys the application and model services together with Istio traffic management and a full monitoring stack based on Prometheus and Grafana.  
-The initial Helm templates were generated using `kompose convert` and then manually adapted and extended to meet the assignment requirements.
+This Helm chart deploys the application and model services together with **Istio traffic management** and a full **monitoring stack** based on **Prometheus and Grafana**.
+
+The application is instrumented with Prometheus metrics, which are scraped by a Prometheus instance provided via the **`kube-prometheus-stack` subchart** and visualized using **pre-provisioned Grafana dashboards**.
+
+---
+
+## Prerequisites
+
+### Kubernetes Cluster
+
+This setup is intended to run on **Minikube**.
+
+```bash
+minikube start
+kubectl get nodes
+```
+
+### Helm
+
+Ensure Helm is installed and initialized:
+
+```bash
+helm version
+helm repo update
+```
 
 ---
 
 ## Installation
-### Prepare Helm Repositories
+
+### Update dependencies
+
+This chart includes `kube-prometheus-stack` as a **required dependency**.
 
 ```bash
-helm repo update
+helm dependency update ./helm-chart
 ```
 
 ### Lint the chart
 
 ```bash
-helm lint helm-chart/
+helm lint ./helm-chart
 ```
 
 ### Install the chart
 
 ```bash
-helm dependency update ./helm-chart
 helm install assignment-release ./helm-chart
 ```
 
@@ -40,36 +65,7 @@ kubectl get services
 
 ---
 
-## Prerequisites
-
-### Minikube
-
-```bash
-minikube start
-kubectl get nodes
-```
-
-### Prometheus Operator
-
-This chart relies on `ServiceMonitor` resources, so the Prometheus Operator must be installed. It is included in the `kube-prometheus-stack` Helm chart, which is a dependency of this chart. In case it is not installed automatically, you can install it manually:
-
-```bash
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-helm install monitoring prometheus-community/kube-prometheus-stack
-```
-
-Verify CRDs:
-
-```bash
-kubectl get crds | grep monitoring.coreos.com
-```
-
----
-
 ## Istio Setup
-
-> From here onward, the process has only been tested on WSL, so it might be more complicated compared to Linux or macOS systems.
 
 ### Enable sidecar injection
 
@@ -77,50 +73,90 @@ kubectl get crds | grep monitoring.coreos.com
 kubectl label namespace default istio-injection=enabled
 ```
 
-Verify Istio:
+Verify Istio is running:
 
 ```bash
 kubectl get pods -n istio-system
 ```
 
-### Access the application through Istio
+---
+
+## Accessing the Application
+
+### Non-WSL users (Linux / macOS)
+
+For non-WSL environments, Minikube exposes services directly via localhost.
+
+The application should be reachable through Istio without additional steps once the ingress is created.
+
+Example:
+
+```bash
+http://localhost/
+```
+
+### WSL users (Windows Subsystem for Linux)
+
+WSL does **not** automatically expose Minikube services to the Windows host.
+You must explicitly expose the Istio ingress gateway port.
+
+Run the following and keep it open:
 
 ```bash
 minikube service istio-ingressgateway -n istio-system --url
 ```
 
-If multiple URLs are returned, use the one that responds correctly (typically the second).
+This will output a URL such as:
 
-Example:
-
-```bash
-curl http://127.0.0.1:<INGRESS_PORT>/
+```text
+http://127.0.0.1:<INGRESS_PORT>
 ```
+
+Use that port to access the application.
 
 ---
 
 ## Monitoring Overview
 
-The application exposes Prometheus metrics at `/metrics`.
-Prometheus scrapes these metrics using `ServiceMonitor` resources, and Grafana visualizes them using provisioned dashboards and datasources.
+* The application exposes Prometheus metrics at **`/metrics`**
+* Metrics are scraped using **ServiceMonitor** resources
+* Prometheus is provided by **`kube-prometheus-stack` (subchart)**
+* Grafana dashboards are **auto-provisioned via ConfigMaps**
 
-Prometheus instance:
+### Prometheus
+
+Prometheus is **not exposed externally**.
+
+Internal service name:
 
 ```
 monitoring-kube-prometheus-prometheus
 ```
 
+To access Prometheus manually:
+
+```bash
+kubectl port-forward monitoring-kube-prometheus-prometheus 9090:9090
+```
+
+Then open:
+
+```text
+http://localhost:9090
+```
+
 ---
 
-## Prometheus Metrics
+## Exposed Metrics
 
-Example exposed metrics:
+The application exports the following metrics:
 
-* `sms_requests_total`
-* `sms_last_confidence`
-* `sms_request_duration_seconds`
+* `sms_requests_total` (Counter)
+* `sms_last_confidence` (Gauge)
+* `sms_request_duration_seconds` (Histogram)
+* `sms_ui_clicks_total` (UI interaction Counter)
 
-Manual verification:
+Manual verification (via Istio ingress):
 
 ```bash
 curl http://127.0.0.1:<INGRESS_PORT>/metrics | grep sms_
@@ -132,71 +168,67 @@ curl http://127.0.0.1:<INGRESS_PORT>/metrics | grep sms_
 
 ### Access Grafana
 
-Grafana should be available at `http://localhost/grafana` either through Nginx Ingress or Istio. In case it is not accessible, you can port-forward the service.
+Grafana **is exposed** and should be reachable via:
+
+```text
+http://localhost/grafana
+```
+
+If Grafana is not reachable, use port-forwarding:
 
 ```bash
-kubectl port-forward svc/assignment-release-grafana 3000:80
+kubectl port-forward svc/assignment-release-helm-chart-grafana 3000:3000
 ```
 
-With Minikube:
-```bash
-minikube service assignment-release-grafana --url
+Then open:
+
+```text
+http://localhost:3000
 ```
 
-Login:
+### Login credentials
 
-* Username: `admin`
-* Password: value configured via Helm values (should be `password123`)
-
-### Provisioning
-
-Grafana is provisioned using ConfigMaps:
-
-* Prometheus datasource
-* Dashboard provisioning config
-* Dashboard JSON definitions
-
-The Prometheus datasource URL:
-
-```
-http://monitoring-kube-prometheus-prometheus:9090
-```
+* **Username:** `admin`
+* **Password:** `password123`
 
 ---
 
 ## Dashboards
 
+Two dashboards are pre-provisioned:
+
 ### SMS App Metrics Dashboard
 
 Visualizes:
 
-* Spam and ham confidence (gauges)
-* Request rate using `rate(sms_requests_total)`
-* Request latency (average, p50, p95)
-* Total spam vs ham classifications
+* Spam / ham confidence (gauges)
+* Request rate
+* Request latency (avg, p50, p95)
+* Spam vs ham classification totals
+* UI submit click count
 
 ### SMS Experimental A/B Testing Dashboard
 
-Used when Istio canary routing is enabled.
-Visualizes:
+Used with Istio canary routing:
 
 * Traffic split between v1 and v2
-* Latency comparison between versions
-* Request volume per version
+* Latency comparison
+* Total requests for v1 and v2
+* Request rate per version
+* Traffic distribution
+* Mode preference (bulk or single message)
 
 ---
 
 ## Testing Workflow
 
-### Get ingress port
+### (WSL only) Get ingress port
 
 ```bash
 minikube service istio-ingressgateway -n istio-system --url
 ```
 
-> This might not be needed on Linux or macOs
-
-Keep it open in a terminal and in another terminal:
+Set the port:
 
 ```bash
 INGRESS_PORT=<PORT>
@@ -213,37 +245,7 @@ for i in {1..50}; do
 done
 ```
 
-### Verify in Grafana
-
-First port-forward:
-
-```bash
-kubectl port-forward svc/assignment-release-helm-chart-grafana 3000:3000
-```
-
-Then:
-
-1. Open Grafana
-2. Go to dashboard
-3. Select under `general`
-   - `SMS App Matrics Dashboard` to view the last spam/ham confidence, the sms request rate, the request duration diagram, total sms classification and the spam-ham distribution
-   - `SMS Experimantal A/B Testing Dashboard` to view the request rate between stable and canary, the latency comparison, traffic distribution and v1/v2 total requests. 
-
-or
-
-1. Open Grafana
-2. Go to **Explore**
-3. Select the `prometheus` datasource
-4. Query:
-
-```
-sms_requests_total
-```
-
-Then open the dashboards and set the time range to **Last 5–15 minutes**.
-
-You can also generate more traffic to view the values update live
-
+Metrics should now appear in Grafana.
 
 ---
 
@@ -252,20 +254,15 @@ You can also generate more traffic to view the values update live
 ### Dashboards show no data
 
 * Ensure traffic was generated
-* Verify correct ingress port
-* Check Prometheus targets
+* Verify the correct ingress port (WSL)
+* Check Prometheus targets:
 
 ```bash
-kubectl port-forward svc/monitoring-kube-prometheus-prometheus 9090:9090
+kubectl port-forward monitoring-kube-prometheus-prometheus 9090:9090
 ```
 
 Query:
 
-```
+```text
 sms_requests_total
 ```
-
-### Datasource not found
-
-* Ensure the Prometheus datasource ConfigMap is mounted correctly
-* Restart Grafana if needed
