@@ -103,11 +103,11 @@ All Kubernetes tooling, access instructions, and operational details are documen
 * **Cluster services & tooling** -> [`infra/k8s/README.md`](./infra/k8s/README.md)
 ---
 
-## Kubernetes Application Deployment (Helm)
+## Assignment 3 - Kubernetes Deployment and Monitoring
 
 The SMS Checker application is deployed to Kubernetes using a **single Helm chart** located in `helm-chart/`.
 
-### What the Helm chart installs
+The Helm chart installs the following components:
 
 * App and model Deployments and Services
 * Istio Gateway, VirtualServices, and DestinationRules
@@ -116,70 +116,21 @@ The SMS Checker application is deployed to Kubernetes using a **single Helm char
 * Grafana with pre-provisioned dashboards and datasources
 * Secrets and ConfigMaps for configuration
 
-Detailed Helm usage, prerequisites, and verification steps are documented here:
-
-* **Helm chart, monitoring & dashboards** -> [`helm-chart/README.md`](./helm-chart/README.md)
-
----
-
-## Accessing the Application via Ingress
-
-### Istio Ingress (Kubernetes)
-
-After installing Istio and deploying the Helm chart:
+To deploy the Helm chart, upon editing `values.yaml` to your preferences as required (remember to disable Istio config if not available), follow these steps:
 
 ```bash
-kubectl get svc -n istio-system istio-ingressgateway
+helm repo update
+helm dependency update ./helm-chart
+helm install assignment-release ./helm-chart
 ```
 
-Retrieve the external IP or port (depending on environment).
+Verify that all components are running with `kubectl get pods`.
 
-#### Minikube
+The `app` Deployment should be available either through an Nginx Ingress or Istio Ingress Gateway, depending on your cluster setup, at `http://localhost` (no special host configuration has been made). The Grafana dashboard should also be available at `http://localhost/grafana` (default credentials: `admin` / `password123`, unles otherwise set in your `values.yaml`).
 
-```bash
-minikube service istio-ingressgateway -n istio-system --url
-```
+The `model-service` and all other components are not publically available through Ingress, and would require port-forwarding. Ensure canary and shadow versions are disabled in all relevant options, when not using Istio, as not doing so may have adverse effects in routing.
 
-Then access:
-
-```
-http://<INGRESS_ADDRESS>/sms
-```
-
-Metrics are available at:
-
-```
-http://<INGRESS_ADDRESS>/metrics
-```
-
----
-
-## Monitoring: Prometheus & Grafana
-
-Monitoring is deployed as part of the Helm chart.
-
-### Prometheus
-
-* Scrapes metrics exposed by both app and model services
-* Uses `ServiceMonitor` resources
-* Includes alert rules
-
-Example metrics:
-
-* `sms_requests_total`
-* `sms_last_confidence`
-* `sms_request_duration_seconds`
-
-### Grafana
-
-* Automatically provisioned dashboards
-* Prometheus datasource configured via ConfigMaps
-
-Access instructions and dashboard descriptions are available in:
-
-* `helm-chart/README.md`
-
----
+Further information and commands regarding access in adverse scenarios may be available in the `helm-chart/README.md`, as well as the `docs/` directory.
 
 ## Service Mesh & Traffic Management
 
