@@ -178,11 +178,9 @@ This week, I worked on documenting extension proposal, and also provide an imple
 
 **PRs Created:**
 
-https://github.com/doda2025-team20/operation/pull/36
+A2 – Provision Kubernetes Infrastructure: https://github.com/doda2025-team20/operation/pull/36
+This PR automates Ansible inventory generation directly from the Vagrant setup, ensuring the controller and worker nodes are always in sync with the actual VM topology. It also updates host resolution to be fully dynamic, removing hard-coded node entries. Together, these changes improve reproducibility, reduce manual setup errors, and strengthen the A2 provisioning workflow.
 
-**PRs Approved:**
-
-https://github.com/doda2025-team20/operation/pull/32
 
 
 
