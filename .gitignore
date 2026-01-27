@@ -9,4 +9,4 @@ kubeconfig
 
 charts/
 
-inventory.cfg
+infra/inventory.cfg
