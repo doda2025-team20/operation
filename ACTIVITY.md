@@ -125,6 +125,10 @@ This week I worked on adding full monitoring support for the application by inte
 
 https://github.com/doda2025-team20/operation/pull/24
 
+A4 – Istio Traffic Management (quality/safety improvement):
+This PR strengthens the app DestinationRule by using the fully-qualified service name (FQDN) for reliable Istio routing across namespaces and adds optional outlier detection (behind a Helm value flag) to improve resilience against failing pods. Functionality stays the same by default; it mainly reduces routing edge-cases and enables safer operation when explicitly turned on.
+
+
 **PRs Approved:**
 
 (https://github.com/doda2025-team20/operation/pull/25)
@@ -143,6 +147,12 @@ This week I changed the Vagrantfile and the ansible playbooks so that the /etc/h
 `Moegiez Bhatti`: TO BE SPECIFIED
 
 **PRs Created:**
+
+https://github.com/doda2025-team20/operation/pull/24
+
+A4 – Istio Traffic Management (quality/safety improvement):
+This PR strengthens the app DestinationRule by using the fully-qualified service name (FQDN) for reliable Istio routing across namespaces and adds optional outlier detection (behind a Helm value flag) to improve resilience against failing pods. Functionality stays the same by default; it mainly reduces routing edge-cases and enables safer operation when explicitly turned on.
+
 
 https://github.com/doda2025-team20/operation/pull/28
 
