@@ -154,6 +154,7 @@ This week I debugged the new workflow and component that automatically release a
 
 A2 – Provision Kubernetes Infrastructure (robustness & reproducibility):  
 This PR fixes issues uncovered during a clean A2 run by removing implicit assumptions in the Ansible playbooks. It adds a static inventory for consistent cluster management, ensures kubectl works reliably under become:true by configuring root’s kubeconfig on the controller, and stabilizes worker joins by correctly sharing the kubeadm join command via controller facts and hostvars. Together, these changes make Kubernetes provisioning fully reproducible from a fresh setup and more resilient to clean re-deployments.
+
 ### Week Q2.10 (Jan 26 - 27)
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/50\
@@ -173,4 +174,7 @@ This week I worked on fixing the release workflow for the model service, as well
 `Calin-Stefan Georgescu` : https://github.com/doda2025-team20/operation/pull/45
 
 This week I worked on fixing the maven credentials that were causing the pipeline to fail on the app repository. I also worked on fixing a missing storageClass provisioner for the cluster, which was making our PersistentVolumeClaimns to never bound to a storage. I updated the readme to inclue instructions on how to apply the flux playbook to sync the cluster with a GitOps repository containing the deployment of our chart.
+
+`Norah E. Milanesi`: https://github.com/doda2025-team20/app/pull/16/\
+This week, I extended the application’s monitoring capabilities by adding a UI-specific metrics endpoint to the app-service. The frontend now records user interaction events, specifically the total number of times users click the submit button, and exposes this information as a metric. This metric is scraped by Prometheus and visualized in Grafana, where I added dedicated panels to show overall UI usage and trends over time.
 
