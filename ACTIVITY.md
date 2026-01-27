@@ -150,22 +150,16 @@ This week I reworked the Prometheus stack installation, which before was happeni
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/team20-flux/pull/1\
 This week I debugged the new workflow and component that automatically release a new version of the helm chart any time a change happens. The wrong token was used when the job was run, and the package location settings had to be changed to allow this current repo to push a new chart. I also spent time reviewing the final documentations and make sure the commands mentioned also work on different Operating Systems. I also wrote documentation for the flux repo used, providing information on the structure, usage and useful commands for debugging it.
 
-`Moegiez Bhatti`: TO BE SPECIFIED
+`Moegiez Bhatti`: https://github.com/doda2025-team20/operation/pull/38
 
-**PRs Created:**
-
-A2 – Provision Kubernetes Infrastructure (robustness & reproducibility):  https://github.com/doda2025-team20/operation/pull/38
+A2 – Provision Kubernetes Infrastructure (robustness & reproducibility):  
 This PR fixes issues uncovered during a clean A2 run by removing implicit assumptions in the Ansible playbooks. It adds a static inventory for consistent cluster management, ensures kubectl works reliably under become:true by configuring root’s kubeconfig on the controller, and stabilizes worker joins by correctly sharing the kubeadm join command via controller facts and hostvars. Together, these changes make Kubernetes provisioning fully reproducible from a fresh setup and more resilient to clean re-deployments.
 ### Week Q2.10 (Jan 26 - 27)
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/50\
 This week while preparing for the final submission, we noticed multiple open wounds that needed work, and I thus had multiple smaller tasks to complete. I reviewed our automatic release pipelines, and added missing canary workflows to both the `app` and `model-service` repositories, ensuring that canary images are built and pushed on every commit to the `canary` branch for easy testing. I added the bulk processing feature to our solution, which constituted a more meaningful experiment than just implementing a new UI, and created the metrics for it. I integrated the new metrics into our Grafana Experiment Dashboard, and wrote the documentation for the continuous experimentation. I corrected the Istio traffic rules that did not offer consistent routing between release `v1` and canary `v2` of each service, and additionally made sure `canary` and `shadow` deployments were no longer mutually exclusive, allowing us to run both strategies simultaneously. I updated the model service to pull the desired model based on version as per the rubric, instead of full URL. I also fixed the proper communication of the confidence score of a prediction from the model service to the app, and thus metrics and Grafana, which was previously broken. Finally, I reviewed and polished the documentation for clarity and completeness, updating stale links referring to old tags and branches, and ensuring all instructions were accurate and easy to follow, while providing a refreshed and comprehensive diagram of our final architecture.
 
-`Moegiez Bhatti`: TO BE SPECIFIED
-
-**PRs Created:**
-
-https://github.com/doda2025-team20/operation/pull/48
+`Moegiez Bhatti`: A2/A4: https://github.com/doda2025-team20/operation/pull/48 A4: 
 
 This change adds an automated, idempotent Istio installation to the cluster setup. It detects the VM architecture (ARM vs x86), downloads the matching Istio release, installs istioctl, and deploys the Istio control plane and ingress components only if they are not already present. The playbook verifies the binary architecture, waits for core Istio components to become ready, and integrates the process into the existing finalization step, ensuring a clean, repeatable setup without manual intervention.
 
