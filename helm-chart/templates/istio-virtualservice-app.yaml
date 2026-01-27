@@ -24,7 +24,8 @@ spec:
         host: {{ .Values.app.name }}
         subset: v1
 
-  # v2 Cookie
+  {{- if .Values.istio.canary.enabled }}
+  # v2 Cookie (only valid when v2 subset exists)
   - match:
     - headers:
         cookie:
@@ -33,6 +34,7 @@ spec:
     - destination:
         host: {{ .Values.app.name }}
         subset: v2
+  {{- end }}
 
   # Default routing
   - match:
