@@ -1,7 +1,7 @@
 services:
   app-service:
     image: ${APP_IMAGE}
-    container_name: app-service
+    container_name: app
     ports:
       - "${HOST_APP_PORT}:${APP_PORT}"
     environment:
@@ -16,7 +16,7 @@ services:
     container_name: model-service
     environment:
       MODEL_PORT: ${MODEL_PORT}
-      MODEL_URL: ${MODEL_URL}
+      MODEL_VERSION: ${MODEL_VERSION}
       DEBUG: ${DEBUG}
     volumes:
       - ./output:/sms/output
