@@ -23,23 +23,9 @@ Each component is built, versioned, and deployed independently.
 
 ---
 
-## Project Context
+## Assignment 1 - Release Pipelines and Containerization
 
-The SMS Checker application initially consisted of a simple HTML/JavaScript frontend connected to a trivial backend.
-Early versions served the frontend via Spring Boot, using an API gateway to forward requests to the model service and avoid cross-site scripting issues.
-
-Throughout the course, the system was extended to:
-
-* run all components as standalone container images
-* communicate exclusively via REST APIs or shared versioned libraries
-* support both local execution (Docker Compose) and Kubernetes-based deployment
-* include ingress, traffic management, and monitoring
-
----
-
-## Local Development (Docker Compose)
-
-For local development and testing, the entire system can be started using Docker Compose.
+For local development and testing, the entire system can be started using Docker Compose. Both images for the `app` and `model-service` are available on the GitHub container registry, and are publicly accessible. A provided `.env` file sets deployment parameters, such as images, published ports, and model version used, and can be modified directly to update the Docker Compose deployment without touching its `.yaml` configuration.
 
 ### Prerequisites
 
@@ -48,14 +34,17 @@ For local development and testing, the entire system can be started using Docker
 
 ### Running the application
 
+Adjust `.env` to your preferences as required (more details available below). Then, just run:
+
 ```bash
 docker compose up -d
 ```
 
 ### Accessing the application
 
-* **SMS Checker**: [http://localhost:8080/sms](http://localhost:8080/sms)
-* **About page (lib-version info)**: [http://localhost:8080/about](http://localhost:8080/about)
+* **SMS Checker**: [http://localhost:8080](http://localhost:8080) => Redirects to `/sms`
+* **Metrics**: [http://localhost:8080/metrics](http://localhost:8080/metrics)
+* **About**: [http://localhost:8080/about](http://localhost:8080/about)
 
 ### Configuration (`.env`)
 
