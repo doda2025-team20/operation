@@ -8,3 +8,5 @@ vagrant/kubeconfig
 kubeconfig
 
 charts/
+
+inventory.cfg
