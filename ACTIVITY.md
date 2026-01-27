@@ -206,3 +206,7 @@ https://github.com/doda2025-team20/operation/pull/48
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/49\, https://github.com/doda2025-team20/operation/pull/55\, https://github.com/doda2025-team20/model-service/pull/15\
 This week I worked on fixing the release workflow for the model service, as well as the train and release one. Afterwards I made a manual release of a future model release which I set the shadow deployment from A4 to use using the environmental image configuration. Finally, I added a new Persistent Volume Claim for the shadow deployment so that the new model version is stored there for the shadow deployment to use, but not for the v1 and v2 deployments. Finally, I ran the whole project to confirm that everything works as expected.
 
+`Calin-Stefan Georgescu` : https://github.com/doda2025-team20/operation/pull/45
+
+This week I worked on fixing the maven credentials that were causing the pipeline to fail on the app repository. I also worked on fixing a missing storageClass provisioner for the cluster, which was making our PersistentVolumeClaimns to never bound to a storage. I updated the readme to inclue instructions on how to apply the flux playbook to sync the cluster with a GitOps repository containing the deployment of our chart.
+
