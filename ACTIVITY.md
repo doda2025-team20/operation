@@ -107,6 +107,7 @@ This week, I worked on implementing a shadow launch strategy for the model servi
 
 https://github.com/doda2025-team20/model-service/pull/11
 
+This PR refactors read_data.py to make it more robust and reproducible by introducing a clear entry point (main()), explicit dataset path configuration, and proper file handling. These changes improve script reliability and consistency across environments, aligning with A1’s focus on clean, maintainable, and reproducible artifacts.
 **PRs Approved:**
 
 https://github.com/doda2025-team20/operation/pull/20
