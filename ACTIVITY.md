@@ -19,11 +19,7 @@ This week, I worked on containerizing the `model-service` backend. I created the
 `Petre-Alexandru Hautelman`: [lib-version](https://github.com/doda2025-team20/lib-version/pull/1), [app](https://github.com/doda2025-team20/app/pull/4/files)\
 I worked on the initial implementation of the `lib-version` library. Additionally, I focused on installing and integrating the library into the `app` project. This involved making modifications to the `app` Dockerfile and the GitHub workflow, such that the Maven m2 secrets are not included in the published Docker image.
 
-`Moegiez Bhatti`: 
-
-**PRs Created:**
-
-https://github.com/doda2025-team20/lib-version/pull/4
+`Moegiez Bhatti`: https://github.com/doda2025-team20/lib-version/pull/4
 
 During this week, I contributed to A1 (Versioning & Releases) by extending the lib-version release setup. I added and refined GitHub Actions workflows to support pre-releases on non-main branches and controlled stable releases on main, ensuring proper semantic versioning, tagging, and publishing to GitHub Packages. This work helped establish a clear separation between development builds and stable artifacts.
 
@@ -41,11 +37,7 @@ After that shared foundation, I focused on implementing some provisioning steps 
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/6\
 This week, I worked on the initial files required for setting up the kubernetes dashboard, as well as istio installation using helm. Additionally, I worked on documenting the steps required to access the kubernetes dashboard securely using kubectl port-forwarding and a bearer token. I also added some sample files for creating an istio gateway. Will provide extra ansible playbooks for installing istio and the dashboard.
 
-`Moegiez Bhatti`: 
-
-**PRs Created:**
-
-https://github.com/doda2025-team20/model-service/pull/10 (Extra commit w2, compensation for w3)
+`Moegiez Bhatti`: https://github.com/doda2025-team20/model-service/pull/10 (Extra commit w2, compensation for w3)
 
 This PR adds an automated, versioned release process for trained model artifacts using GitHub Actions and GitHub Releases, aligning with A1’s focus on reproducible versioning and releases.
 
@@ -73,16 +65,10 @@ This week I worked on finishing the playbook for the istio and kubernetes dashbo
 `Petre-Alexandru Hautelman`: https://github.com/doda2025-team20/operation/pull/12
 I worked on the initial migration of the Docker Compose files to Kubernetes. I created a Helm chart for deploying the model and application services, which connects the app to the model server. The deployments utilize configurable variables for the name, image, and port, and the model service includes an optional shared folder.
 
-`Moegiez Bhatti`: TO BE SPECIFIED
-
-**PRs Created:**
-
-https://github.com/doda2025-team20/app/pull/7
+`Moegiez Bhatti`: https://github.com/doda2025-team20/app/pull/7
 
 This PR introduces basic operational observability into the frontend service. It instruments the SMS classification flow to record request counts (spam vs ham), last confidence values, and end-to-end request latency. These metrics are exposed through a /metrics endpoint in a Prometheus-compatible text format, allowing the service to be scraped, monitored, and analyzed during runtime. This supports A3 by enabling visibility into system behavior, performance, and usage patterns once the application is running in Kubernetes.
-**PRs Approved:**
 
-https://github.com/doda2025-team20/operation/pull/15
 
 ### Week Q2.5 (Dec 8 - 14)
 
@@ -98,39 +84,20 @@ This week I went back to our A2 submission, for which we had only an initial att
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/20\
 This week, I worked on implementing a shadow launch strategy for the model service using Istio. I modified the existing VirtualService configuration to include traffic mirroring from the stable version (v1) to the newer shadown version (v3) of the model service. This setup allows us to test the new version under real traffic conditions without impacting the user experience. Additionally, I worked on writing documentation for our entire deployment strategies, including both canary deployment and shadow launch.
 
-`Moegiez Bhatti`: TO BE SPECIFIED
-
-**PRs Created:**
-
-https://github.com/doda2025-team20/model-service/pull/11
+`Moegiez Bhatti`: https://github.com/doda2025-team20/model-service/pull/11
 
 This PR refactors read_data.py to make it more robust and reproducible by introducing a clear entry point (main()), explicit dataset path configuration, and proper file handling. These changes improve script reliability and consistency across environments, aligning with A1’s focus on clean, maintainable, and reproducible artifacts.
-**PRs Approved:**
 
-https://github.com/doda2025-team20/operation/pull/20
-
-https://github.com/doda2025-team20/operation/pull/18
 
 ### Week Q2.6 (Dec 15 - Dec 21)
 
 `Norah E. Milanesi`: https://github.com/doda2025-team20/operation/pull/25\
 This week I worked on adding full monitoring support for the application by integrating Prometheus metrics with Grafana dashboards. The dashboards were configured to display the required metrics using multiple visualizations, including gauges, time series, bar charts, and pie charts, covering request rates, classification counts, confidence scores, and latency. Additional panels were created to clearly show traffic distribution and behavior between the stable (v1) and canary (v2) versions. To ensure accurate latency calculations, the MetricsController in the app repository was updated to expose cumulative histogram buckets, allowing Prometheus and Grafana to aggregate and display the metrics correctly as traffic is generated.
 
-`Moegiez Bhatti`: TO BE SPECIFIED
-
-**PRs Created:**
-
-https://github.com/doda2025-team20/operation/pull/24
+`Moegiez Bhatti`: https://github.com/doda2025-team20/operation/pull/24
 
 A4 – Istio Traffic Management (quality/safety improvement):
 This PR strengthens the app DestinationRule by using the fully-qualified service name (FQDN) for reliable Istio routing across namespaces and adds optional outlier detection (behind a Helm value flag) to improve resilience against failing pods. Functionality stays the same by default; it mainly reduces routing edge-cases and enables safer operation when explicitly turned on.
-
-
-**PRs Approved:**
-
-(https://github.com/doda2025-team20/operation/pull/25)
-
-https://github.com/doda2025-team20/app/pull/11
 
 
 ### Week Q2.7 (Jan 5 - Jan 11)
@@ -141,22 +108,13 @@ Worked on properly reimplementing the sticky session routing using a `canary` co
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/29\
 This week I changed the Vagrantfile and the ansible playbooks so that the /etc/hosts file in each node is dynamically generated. Beforehand we had a hardcoded /infra/playbooks/hosts file that was manually copied into each of the nodes, and now we use ansible.builtin.blockinfile to create the /etc/hosts file dynamically instead.
 
-`Moegiez Bhatti`: TO BE SPECIFIED
+`Moegiez Bhatti`: https://github.com/doda2025-team20/operation/pull/24
 
-**PRs Created:**
-
-
-
-A4 – Istio Traffic Management (quality/safety improvement): https://github.com/doda2025-team20/operation/pull/24
+A4 – Istio Traffic Management (quality/safety improvement): 
 This PR strengthens the app DestinationRule by using the fully-qualified service name (FQDN) for reliable Istio routing across namespaces and adds optional outlier detection (behind a Helm value flag) to improve resilience against failing pods. Functionality stays the same by default; it mainly reduces routing edge-cases and enables safer operation when explicitly turned on.
 
+This pr made pins the explicit versions of core Kubernetes tools (containerd, runc, kubeadm, kubelet, kubectl) in the Ansible provisioning playbook. By avoiding implicit “latest” installs, it ensures reproducible cluster setups, prevents unexpected upgrades, and aligns the infrastructure with the exact versions used and tested for A2: https://github.com/doda2025-team20/operation/pull/28
 
-
-This PR pins explicit versions of core Kubernetes tools (containerd, runc, kubeadm, kubelet, kubectl) in the Ansible provisioning playbook. By avoiding implicit “latest” installs, it ensures reproducible cluster setups, prevents unexpected upgrades, and aligns the infrastructure with the exact versions used and tested for A2: https://github.com/doda2025-team20/operation/pull/28
-
-**PRs Approved:**
-
-(https://github.com/doda2025-team20/operation/pull/27)
 ### Week Q2.8 (Jan 12 - 18)
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/32\
