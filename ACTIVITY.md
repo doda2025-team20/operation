@@ -165,6 +165,7 @@ This change adds an automated, idempotent Istio installation to the cluster setu
 
 A4: The other PR adds a small safety improvement to the Istio sticky-session configuration by guarding the canary=v2 route behind the canary flag and aligning the sticky-session cookie with the canary
 
+SIDENOTE: In the activity email I received it was noted I was missing an a4 contribituin, however this was not correct as the following contribution to A4 was overseen: https://github.com/doda2025-team20/operation/pull/24. 
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/49\, https://github.com/doda2025-team20/operation/pull/55\, https://github.com/doda2025-team20/model-service/pull/15\
 This week I worked on fixing the release workflow for the model service, as well as the train and release one. Afterwards I made a manual release of a future model release which I set the shadow deployment from A4 to use using the environmental image configuration. Finally, I added a new Persistent Volume Claim for the shadow deployment so that the new model version is stored there for the shadow deployment to use, but not for the v1 and v2 deployments. Finally, I ran the whole project to confirm that everything works as expected.
