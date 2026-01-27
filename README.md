@@ -132,56 +132,47 @@ The `model-service` and all other components are not publically available throug
 
 Further information and commands regarding access in adverse scenarios may be available in the `helm-chart/README.md`, as well as the `docs/` directory.
 
-## Service Mesh & Traffic Management
+## Assignment 4 - Istio & Traffic Management
 
-The project uses **Istio** to implement advanced traffic management.
+The project uses **Istio** to implement advanced traffic management. Ensure to activate Istio sidecar injection in the target namespace before deploying the Helm chart. For the default namespace:
+
+```bash
+kubectl label namespace default istio-injection=enabled
+```
+
+It is recommended to do a full uninstall and install of the Helm chart after enabling Istio injection, to ensure all pods have sidecars injected.
+
+The service mesh allows activating further options in the `values.yaml` file of the Helm chart, such as a canary deployment of the `app` and `model-service`, as well as shadow launching a third version of the `model-service`. These options leverage Istio's VirtualServices and DestinationRules to route traffic accordingly. Other than activating all relevant options in `values.yaml`, no further configuration is required, as the Helm chart fully integrates Istio resources.
 
 ### Architecture
 
 * **Istio Ingress Gateway**: Handles all incoming traffic.
-* **VirtualServices & DestinationRules**: Manage routing between `v1` (stable), `v2` (canary), and `v3` (shadow) versions of the services.
+* **VirtualServices & DestinationRules**: Manage routing between `v1` (stable), `v2` (canary), and `v3` (shadow) versions of the services, where available. By default, 10% of traffic is routed to the canary version. For version-sticky sessions, the `canary` cookie can be set to `v1` or `v2` manually. No separate hostname has been defined for the canary traffic, but setting that cookie to the desired version in the browser developer tools will route traffic accordingly.
 * **Envoy Sidecars**: Injected into every application pod to intercept and control traffic.
 
-Detailed explanation of the deployment strategies (Canary vs. Shadow Launch) and data flow can be found in:
+Further documentation on the deployment strategies can be found in [`docs/deployment.md`](./docs/deployment.md). Our experimental function using the service mesh is documented in [`docs/continuous-experimentation.md`](./docs/continuous-experimentation.md).
 
-* **Deployment & Traffic Flow Documentation** -> [`docs/deployment.md`](./docs/deployment.md)
-
-### Implementation Details
-
-The Istio configuration is **fully integrated into the Helm chart**.
-The resources (VirtualServices, Gateways, etc.) are defined in `helm-chart/templates/`.
-
----
-
-## Additional Documentation
-
-* **Team activity log**: `ACTIVITY.md`
-
----
-
-## Project Extension: GitOps (Assignment A5)
+### Project Extension: GitOps
 
 For the optional extension, we implemented a **GitOps-based deployment pipeline using Flux**.
 
 This replaces the manual Helm commands with an automated, declarative workflow where the cluster state is continuously reconciled with a Git repository.
 
-* **Extension Documentation & Proposal** -> [`docs/extension.md`](./docs/extension.md)
-* **Flux Configuration Repository** -> [doda2025-team20/team20-flux](https://github.com/doda2025-team20/team20-flux)
+* **Extension Documentation & Proposal**: [`docs/extension.md`](./docs/extension.md)
+* **Flux Configuration Repository**: [doda2025-team20/team20-flux](https://github.com/doda2025-team20/team20-flux)
 
 ### Configuring Flux with Vagrant
 
 To set up Flux in the Vagrant-provisioned cluster, follow these steps:
-1. Go to the flux playbook for vagrant [flux.yaml](./infra/playbooks/flux.yaml)
-2. Update the github token variable with your personal access token that has repo access
+1. Go to the flux playbook for vagrant `./infra/playbooks/flux.yaml`
+2. Update the GitHub token variable with your personal access token that has repo access
 3. Run the playbook with the following command:
 ```bash
-ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory playbooks/flux.yaml
+ansible-playbook -i inventory.cfg playbooks/flux.yaml
 ```
 
----
+(In case `inventory.cfg` is not available consult the Assignment 2 section for further information.)
 
+## Additional Documentation
 
-## Ongoing Evolution
-
-The repository layout and startup procedures will be updated as the architectural extensions are introduced.
-This README will be maintained to reflect those changes.
+* **Team activity log**: `ACTIVITY.md`
