@@ -201,8 +201,9 @@ This week I debugged the new workflow and component that automatically release a
 `Moegiez Bhatti`: TO BE SPECIFIED
 
 **PRs Created:**
-https://github.com/doda2025-team20/operation/pull/38
 
+A2 – Provision Kubernetes Infrastructure (robustness & reproducibility):  https://github.com/doda2025-team20/operation/pull/38
+This PR fixes issues uncovered during a clean A2 run by removing implicit assumptions in the Ansible playbooks. It adds a static inventory for consistent cluster management, ensures kubectl works reliably under become:true by configuring root’s kubeconfig on the controller, and stabilizes worker joins by correctly sharing the kubeadm join command via controller facts and hostvars. Together, these changes make Kubernetes provisioning fully reproducible from a fresh setup and more resilient to clean re-deployments.
 ### Week Q2.10 (Jan 26 - 27)
 
 `Konstantinos Syrros`: https://github.com/doda2025-team20/operation/pull/50\
@@ -212,10 +213,10 @@ This week while preparing for the final submission, we noticed multiple open wou
 
 **PRs Created:**
 
+https://github.com/doda2025-team20/operation/pull/48
 
-A2 – Provision Kubernetes Infrastructure (robustness & reproducibility): https://github.com/doda2025-team20/operation/pull/48
+This change adds an automated, idempotent Istio installation to the cluster setup. It detects the VM architecture (ARM vs x86), downloads the matching Istio release, installs istioctl, and deploys the Istio control plane and ingress components only if they are not already present. The playbook verifies the binary architecture, waits for core Istio components to become ready, and integrates the process into the existing finalization step, ensuring a clean, repeatable setup without manual intervention.
 
-This PR fixes issues uncovered during a clean A2 run by removing implicit assumptions in the Ansible playbooks. It adds a static inventory for consistent cluster management, ensures kubectl works reliably under become:true by configuring root’s kubeconfig on the controller, and stabilizes worker joins by correctly sharing the kubeadm join command via controller facts and hostvars. Together, these changes make Kubernetes provisioning fully reproducible from a fresh setup and more resilient to clean re-deployments.
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/49\, https://github.com/doda2025-team20/operation/pull/55\, https://github.com/doda2025-team20/model-service/pull/15\
 This week I worked on fixing the release workflow for the model service, as well as the train and release one. Afterwards I made a manual release of a future model release which I set the shadow deployment from A4 to use using the environmental image configuration. Finally, I added a new Persistent Volume Claim for the shadow deployment so that the new model version is stored there for the shadow deployment to use, but not for the v1 and v2 deployments. Finally, I ran the whole project to confirm that everything works as expected.
