@@ -51,9 +51,7 @@ This week, I worked on the initial files required for setting up the kubernetes 
 https://github.com/doda2025-team20/model-service/pull/10 (Extra commit w2, compensation for w3)
 
 This PR adds an automated, versioned release process for trained model artifacts using GitHub Actions and GitHub Releases, aligning with A1’s focus on reproducible versioning and releases.
-**PRs Approved:**
 
-TBD (extra approval in w10)
 
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/10
 This week I added the initial implementation of the worker nodes's playbook, as well as an initial version of the finalization playbook for MetalLB and Ingres.
