@@ -129,11 +129,8 @@ This week, I improved the project README based on peer feedback, adding clear in
 `Calin-Stefan Georgescu`: https://github.com/doda2025-team20/operation/pull/31 && https://github.com/doda2025-team20/operation/pull/34
 This week, I worked on documenting extension proposal, and also provide an implementation for it. The extension consists of using GitOps for managing the cluster configuration, as well as automating the deployment of the application using FluxCD. I created a sample repository that contains the helm chart, as well as the configuration required for deploying the application using FluxCD. I also wrote documentation that explains why this extension was chosen. I also added a pipeline that automatically releases a new version of the application helm chart, everytime there is a new change in the chart repository.
 
-`Moegiez Bhatti`: TO BE SPECIFIED
+`Moegiez Bhatti`: https://github.com/doda2025-team20/operation/pull/36
 
-**PRs Created:**
-
-A2 – Provision Kubernetes Infrastructure: https://github.com/doda2025-team20/operation/pull/36
 This PR automates Ansible inventory generation directly from the Vagrant setup, ensuring the controller and worker nodes are always in sync with the actual VM topology. It also updates host resolution to be fully dynamic, removing hard-coded node entries. Together, these changes improve reproducibility, reduce manual setup errors, and strengthen the A2 provisioning workflow.
 
 
