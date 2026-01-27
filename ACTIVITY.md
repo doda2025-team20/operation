@@ -108,12 +108,12 @@ Worked on properly reimplementing the sticky session routing using a `canary` co
 `Georgi Dimitrov`: https://github.com/doda2025-team20/operation/pull/29\
 This week I changed the Vagrantfile and the ansible playbooks so that the /etc/hosts file in each node is dynamically generated. Beforehand we had a hardcoded /infra/playbooks/hosts file that was manually copied into each of the nodes, and now we use ansible.builtin.blockinfile to create the /etc/hosts file dynamically instead.
 
-`Moegiez Bhatti`: https://github.com/doda2025-team20/operation/pull/24
+`Moegiez Bhatti`: A2: https://github.com/doda2025-team20/operation/pull/28  A4: https://github.com/doda2025-team20/operation/pull/24
 
 A4 – Istio Traffic Management (quality/safety improvement): 
 This PR strengthens the app DestinationRule by using the fully-qualified service name (FQDN) for reliable Istio routing across namespaces and adds optional outlier detection (behind a Helm value flag) to improve resilience against failing pods. Functionality stays the same by default; it mainly reduces routing edge-cases and enables safer operation when explicitly turned on.
 
-This pr made pins the explicit versions of core Kubernetes tools (containerd, runc, kubeadm, kubelet, kubectl) in the Ansible provisioning playbook. By avoiding implicit “latest” installs, it ensures reproducible cluster setups, prevents unexpected upgrades, and aligns the infrastructure with the exact versions used and tested for A2: https://github.com/doda2025-team20/operation/pull/28
+This pr made for A2 pins the explicit versions of core Kubernetes tools (containerd, runc, kubeadm, kubelet, kubectl) in the Ansible provisioning playbook. By avoiding implicit “latest” installs, it ensures reproducible cluster setups, prevents unexpected upgrades, and aligns the infrastructure with the exact versions used and tested.
 
 ### Week Q2.8 (Jan 12 - 18)
 
