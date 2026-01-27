@@ -10,3 +10,20 @@ spec:
   resources:
     requests:
       storage: {{ .Values.model.storage }}
+
+---
+{{- if .Values.model.shadow.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.model.name }}-shadow-pvc
+  labels:
+    app: {{ .Values.model.name }}
+    version: {{ .Values.model.shadow.tag }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.model.storage }}
+{{- end }}

@@ -17,7 +17,9 @@ spec:
     - name: {{ .Values.model.canary.tag }}
       labels:
         version: {{ .Values.model.canary.tag }}
-  {{- else if .Values.model.shadow.enabled }}
+  {{- end }}
+  
+  {{- if .Values.model.shadow.enabled }}
     # Shadow subset
     - name: {{ .Values.model.shadow.tag }}
       labels:

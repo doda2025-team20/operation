@@ -119,6 +119,8 @@ spec:
         env:
         - name: VERSION
           value: {{ .Values.model.shadow.tag | quote }}
+        - name: MODEL_VERSION
+          value: {{ .Values.model.shadow.modelVersion | default "latest" | quote }}
         volumeMounts:
         - name: model-output
           mountPath: {{ .Values.model.mountPath }}
@@ -130,6 +132,6 @@ spec:
           type: Directory
         {{- else }}
         persistentVolumeClaim:
-          claimName: {{ .Values.model.name }}-pvc
+          claimName: {{ .Values.model.name }}-shadow-pvc
         {{- end }}
 {{- end }}
