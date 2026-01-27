@@ -121,4 +121,17 @@ spec:
           value: {{ .Values.model.shadow.tag | quote }}
         - name: MODEL_VERSION
           value: {{ .Values.model.shadow.modelVersion | default "latest" | quote }}
+        volumeMounts:
+        - name: model-output
+          mountPath: {{ .Values.model.mountPath }}
+      volumes:
+      - name: model-output
+        {{- if .Values.model.useHostPath }}
+        hostPath:
+          path: {{ .Values.model.hostPath }}
+          type: Directory
+        {{- else }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.model.name }}-shadow-pvc
+        {{- end }}
 {{- end }}
