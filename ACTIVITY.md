@@ -27,9 +27,6 @@ https://github.com/doda2025-team20/lib-version/pull/4
 
 During this week, I contributed to A1 (Versioning & Releases) by extending the lib-version release setup. I added and refined GitHub Actions workflows to support pre-releases on non-main branches and controlled stable releases on main, ensuring proper semantic versioning, tagging, and publishing to GitHub Packages. This work helped establish a clear separation between development builds and stable artifacts.
 
-**PRs Approved:**
-
-https://github.com/doda2025-team20/model-service/pull/7
 
 
 ### Week Q2.3 (Nov 24 - Nov 30)
