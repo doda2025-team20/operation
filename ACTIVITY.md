@@ -82,6 +82,7 @@ I worked on the initial migration of the Docker Compose files to Kubernetes. I c
 
 https://github.com/doda2025-team20/app/pull/7
 
+This PR introduces basic operational observability into the frontend service. It instruments the SMS classification flow to record request counts (spam vs ham), last confidence values, and end-to-end request latency. These metrics are exposed through a /metrics endpoint in a Prometheus-compatible text format, allowing the service to be scraped, monitored, and analyzed during runtime. This supports A3 by enabling visibility into system behavior, performance, and usage patterns once the application is running in Kubernetes.
 **PRs Approved:**
 
 https://github.com/doda2025-team20/operation/pull/15
