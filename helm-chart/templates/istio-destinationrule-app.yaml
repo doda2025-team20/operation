@@ -14,7 +14,7 @@ spec:
     loadBalancer:
       consistentHash:
         httpCookie:
-          name: {{ .Values.istio.canary.stickySession.cookieName }}
+          name: {{ .Values.istio.canary.stickySession.cookieName | default "canary" }}
           ttl: 3600s
     # Optional resilience settings (disabled unless explicitly configured)
     {{- if .Values.istio.outlierDetection.enabled }}
